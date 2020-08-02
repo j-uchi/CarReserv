@@ -43,7 +43,7 @@
         android:id="@+id/strNext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="返却:10月10日09時30分"
+        android:text="返却予定:10月10日09時30分"
         android:textSize="24sp"
         app:layout_constraintBottom_toTopOf="@+id/img_back"
         app:layout_constraintEnd_toEndOf="parent"
@@ -63,7 +63,7 @@
         tools:visibility="invisible" />
 
     <ImageView
-        android:id="@+id/img_use"
+        android:id="@+id/img_car"
         android:layout_width="360dp"
         android:layout_height="190dp"
         android:layout_marginTop="120dp"

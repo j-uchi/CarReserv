@@ -27,10 +27,10 @@ class DispReserv : AppCompatActivity() {
         btn_StartDate.setText(getDate())
         btn_StartTime.setText(getTime(0))
         btn_EndDate.setText(getDate())
-        btn_EndTime.setText(getTime(6))
+        btn_EndTime.setText(getTime(3))
 
-        btn_StartDate.setOnClickListener{showDatePicker(btn_StartDate)}
-        btn_StartTime.setOnClickListener{showTimePicker(btn_StartTime)}
+        btn_StartDate.setOnClickListener{showDatePicker(btn_StartDate,btn_EndDate)}
+        btn_StartTime.setOnClickListener{showTimePicker(btn_StartTime,btn_EndTime)}
         btn_EndDate.setOnClickListener{showDatePicker(btn_EndDate)}
         btn_EndTime.setOnClickListener{showTimePicker(btn_EndTime)}
         btnPark.setOnClickListener{ CreateDialog() }
@@ -59,6 +59,10 @@ class DispReserv : AppCompatActivity() {
         var C_Month=time[1].toInt()
         var C_Day=time[2].toInt()
 
+        val minDate = Calendar.getInstance()
+        minDate.set(C_Year,C_Month,C_Day)
+
+
         val datePickerDialog = DatePickerDialog(
             this,
             DatePickerDialog.OnDateSetListener() {view, year, month, dayOfMonth->
@@ -68,6 +72,31 @@ class DispReserv : AppCompatActivity() {
             C_Year,
             C_Month-1,
             C_Day)
+        datePickerDialog.setCanceledOnTouchOutside(false)
+        datePickerDialog.setCancelable(false)
+        datePickerDialog.show()
+    }
+    fun showDatePicker(r1: Button,r2:Button){
+        var str=""
+        var btn=r1.getText().toString()
+        var time=btn.split("年","月","日")
+
+        var C_Year=time[0].toInt()
+        var C_Month=time[1].toInt()
+        var C_Day=time[2].toInt()
+
+        val datePickerDialog = DatePickerDialog(
+            this,
+            DatePickerDialog.OnDateSetListener() {view, year, month, dayOfMonth->
+                str="${year}年${month+1}月${dayOfMonth}日"
+                r1.setText(str)
+                r2.setText(str)
+            },
+            C_Year,
+            C_Month-1,
+            C_Day)
+        datePickerDialog.setCanceledOnTouchOutside(false)
+        datePickerDialog.setCancelable(false)
         datePickerDialog.show()
     }
 
@@ -88,6 +117,31 @@ class DispReserv : AppCompatActivity() {
             C_Hour,
             C_Minuts,
             true)
+        timePickerDialog.setCanceledOnTouchOutside(false)
+        timePickerDialog.setCancelable(false)
+        timePickerDialog.show()
+    }
+    fun showTimePicker(r1: Button,r2: Button){
+        var str=""
+        var btn=r1.getText().toString()
+        var time=btn.split("時","分")
+
+        val C_Hour=time[0].toInt()
+        val C_Minuts=time[1].toInt()
+
+        val timePickerDialog = TimePickerDialog(
+            this,
+            TimePickerDialog.OnTimeSetListener() {view, hour, minutes->
+                str="${hour}時${minutes}分"
+                r1.setText(str)
+                str="${hour+3}時${minutes}分"
+                r2.setText(str)
+            },
+            C_Hour,
+            C_Minuts,
+            true)
+        timePickerDialog.setCanceledOnTouchOutside(false)
+        timePickerDialog.setCancelable(false)
         timePickerDialog.show()
     }
 
@@ -95,11 +149,7 @@ class DispReserv : AppCompatActivity() {
         val List=arrayOf("東比恵","大濠","薬院","学校","その他")
         AlertDialog.Builder(this)
             .setTitle("通知間隔を設定してください")
-            .setItems(List,{dialog,which->SetPark(List[which])}).show()
-    }
-
-    fun SetPark(str:String){
-        btnPark.setText(str)
+            .setItems(List,{dialog,which->btnPark.setText(List[which])}).show()
     }
 
     fun getDate():String{
