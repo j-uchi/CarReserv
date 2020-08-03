@@ -14,14 +14,28 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/strTEST"
+    <EditText
+        android:id="@+id/strName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textSize="18sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginLeft="16dp"
+        android:ems="10"
+        android:hint="InsertName"
+        android:inputType="textPersonName"
+        android:maxLength="8"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnSetName"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:text="変更"
+        app:layout_constraintBottom_toBottomOf="@+id/strName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/strName"
+        app:layout_constraintTop_toTopOf="@+id/strName" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

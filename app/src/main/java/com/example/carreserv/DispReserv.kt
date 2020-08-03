@@ -2,22 +2,23 @@ package com.example.carreserv
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.telephony.TelephonyManager
 import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_disp_reserv.*
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 
 class DispReserv : AppCompatActivity() {
 
-
-
-
-
+    val GLOBAL=MyApp.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,13 +40,35 @@ class DispReserv : AppCompatActivity() {
     }
 
     fun PushData(){
-        val R_ID=Build.BRAND
+        val R_ID=getID()
+        val R_NAME=Build.BRAND
         val R_START_DATE=btn_StartDate.getText().toString()
         val R_START_TIME=btn_StartTime.getText().toString()
         val R_END_DATE=btn_EndDate.getText().toString()
         val R_END_TIME=btn_EndTime.getText().toString()
         val R_PARK=btnPark.getText().toString()
         val R_COMMENT=""+strComment.getText().toString()//NULL対策
+        val R_HASH=CreateHash(R_ID,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME)
+        GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",false,R_HASH)
+        startActivity(Intent(this,DispSend::class.java))
+        finish()
+    }
+
+    fun CreateHash(ID:String,S_D:String,S_T:String,E_D:String,E_T:String):String {
+        var str: String = ID + S_D + S_T + E_D + E_T + "ROADSTAR"
+        return MessageDigest.getInstance("SHA-256")
+            .digest(str.toByteArray())
+            .joinToString(separator = "") {
+                "%02x".format(it)
+            }
+    }
+
+    fun getID():String{
+        var ID:String=Build.ID
+        if(ID.length>10){
+            ID.substring(0,10)
+        }
+        return ID
     }
 
 
