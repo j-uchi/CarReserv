@@ -28,6 +28,9 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener{view->
             startActivity(Intent(this,DispReserv::class.java))
         }
+        println("いにっとった")
+
+
     }
     override fun onRestart() {
         super.onRestart()
