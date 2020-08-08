@@ -7,12 +7,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
+import android.widget.Toast
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.result.Result
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
-import java.io.FileNotFoundException
 import java.text.SimpleDateFormat
 import java.util.*
-import kotlin.random.Random.Default.nextInt
 
 class MainActivity : AppCompatActivity() {
 
@@ -28,13 +31,13 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener{view->
             startActivity(Intent(this,DispReserv::class.java))
         }
-        println("いにっとった")
-
+        swipe_refresh.setOnRefreshListener{ REFLESH() }
 
     }
     override fun onRestart() {
         super.onRestart()
         RandomBackGround()
+        RESPONCE(GLOBAL.RESPONSE_STATE)
     }
     //メニューボタン生成
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -50,6 +53,80 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this,DispSetting::class.java))
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun REFLESH(){
+
+        val POSTDATA = HashMap<String, String>()
+        POSTDATA.put("hash", "this is hash")
+
+
+
+
+        "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+            when (result) {
+                is Result.Success -> {
+                    GLOBAL.RESPONSE_STR=String(response.data)
+                    SETRECORD(GLOBAL.RESPONSE_STR)
+                    swipe_refresh.isRefreshing=false
+                }
+                is Result.Failure -> {
+                }
+            }
+        }
+
+    }
+
+    fun SETRECORD(str:String){
+        val scan= Scanner(str)
+        scan.useDelimiter(",|\n")
+        while(scan.hasNext()) {
+            val ID = scan.next()
+            val NAME = scan.next()
+            val STARTDATE = scan.next()
+            val STARTTIME = scan.next()
+            val ENDDATE = scan.next()
+            val ENDTIME = scan.next()
+            val PARK = scan.next()
+            val S_COMMENT = scan.next()
+            val E_COMMENT = scan.next()
+            val REFUEL = scan.next().toBoolean()
+            GLOBAL.RECORD.add(
+                MyApp.DC_RECORD(
+                    ID,
+                    NAME,
+                    STARTDATE,
+                    STARTTIME,
+                    ENDDATE,
+                    ENDTIME,
+                    PARK,
+                    S_COMMENT,
+                    E_COMMENT,
+                    REFUEL
+                )
+            )
+        }
+    }
+
+    fun RESPONCE(STATE:Int){
+        when(STATE){
+            -1->{
+
+            }
+            0->{
+
+            }
+            1->{
+                Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_LONG).show()
+            }
+            2->{
+                Toast.makeText(applicationContext, "サーバーのエラーログを確認してください", Toast.LENGTH_LONG).show()
+            }
+            3->{
+                Toast.makeText(applicationContext, "サーバーに接続できません", Toast.LENGTH_LONG).show()
+            }
+
+        }
     }
 
 
