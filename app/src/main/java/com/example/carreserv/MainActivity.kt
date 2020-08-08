@@ -8,8 +8,6 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import kotlinx.android.synthetic.main.activity_main.*
@@ -77,9 +75,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
     fun SETRECORD(str:String){
         val scan= Scanner(str)
-        scan.useDelimiter(",|\n")
+        scan.useDelimiter(",")
         while(scan.hasNext()) {
             val ID = scan.next()
             val NAME = scan.next()
@@ -110,12 +109,7 @@ class MainActivity : AppCompatActivity() {
 
     fun RESPONCE(STATE:Int){
         when(STATE){
-            -1->{
 
-            }
-            0->{
-
-            }
             1->{
                 Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_LONG).show()
             }
