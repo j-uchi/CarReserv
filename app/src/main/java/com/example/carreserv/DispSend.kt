@@ -2,14 +2,19 @@ package com.example.carreserv
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.widget.ImageView
+import android.widget.Toast
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import kotlinx.android.synthetic.main.activity_disp_send.*
+import kotlinx.android.synthetic.main.activity_main.*
 import java.security.MessageDigest
 
 class DispSend : AppCompatActivity() {
 
     val GLOBAL=MyApp.getInstance()
+    var mHandler= Handler()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,19 +42,27 @@ class DispSend : AppCompatActivity() {
         "https://myapp.tokyo/carreserv/register.php".httpPost(POSTDATA.toList()).response { request, response, result ->
             when (result) {
                 is Result.Success -> {
-                    val str=String(response.data)
-                    if(str.indexOf("Query OK")!=-1){
-                        GLOBAL.RESPONSE_STATE=1
-                        finish()
+                    if(String(response.data).indexOf("Query OK")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_LONG).show()
+                            finish()
+                        })
                     }
                     else{
-                        GLOBAL.RESPONSE_STATE=2
-                        finish()
+                        mHandler.post(Runnable
+                        {
+                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_LONG).show()
+                            finish()
+                        })
                     }
                 }
                 is Result.Failure -> {
-                    GLOBAL.RESPONSE_STATE=3
-                    finish()
+                    mHandler.post(Runnable
+                    {
+                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_LONG).show()
+                        finish()
+                    })
                 }
             }
         }

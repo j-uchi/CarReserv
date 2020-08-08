@@ -1,41 +1,42 @@
 package com.example.carreserv
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.File
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     val GLOBAL=MyApp.getInstance()
+    var mHandler=Handler()
 
     //起動時動作
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         RandomBackGround()
-        setStatus()
+        REFLESH()
         val fab:View=findViewById(R.id.fab)
         fab.setOnClickListener{view->
             startActivity(Intent(this,DispReserv::class.java))
         }
         swipe_refresh.setOnRefreshListener{ REFLESH() }
-
     }
+    //再アクティブ時動作
     override fun onRestart() {
         super.onRestart()
         RandomBackGround()
-        RESPONCE(GLOBAL.RESPONSE_STATE)
     }
     //メニューボタン生成
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -56,36 +57,38 @@ class MainActivity : AppCompatActivity() {
     fun REFLESH(){
 
         val POSTDATA = HashMap<String, String>()
-        POSTDATA.put("hash", "this is hash")
-
-
-
-
+        POSTDATA.put("hash", CreateHash("test"))
         "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { request, response, result ->
             when (result) {
                 is Result.Success -> {
-                    GLOBAL.RESPONSE_STR=String(response.data)
-                    SETRECORD(GLOBAL.RESPONSE_STR)
+                    SETRECORD(String(response.data))
                     swipe_refresh.isRefreshing=false
+                    setStatus()
                 }
                 is Result.Failure -> {
+                    mHandler.post(Runnable
+                    {
+                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_LONG).show()
+                        finish()
+                    })
                 }
             }
         }
-
     }
 
 
+
     fun SETRECORD(str:String){
+        GLOBAL.RECORD.clear()
         val scan= Scanner(str)
         scan.useDelimiter(",")
         while(scan.hasNext()) {
             val ID = scan.next()
             val NAME = scan.next()
-            val STARTDATE = scan.next()
-            val STARTTIME = scan.next()
-            val ENDDATE = scan.next()
-            val ENDTIME = scan.next()
+            val STARTDATE = scan.next().replaceFirst("-","年").replaceFirst("-","月")+"日"
+            val STARTTIME = scan.next().replaceFirst(":","時").replaceFirst(":00","分")
+            val ENDDATE = scan.next().replaceFirst("-","年").replaceFirst("-","月")+"日"
+            val ENDTIME = scan.next().replaceFirst(":","時").replaceFirst(":00","分")
             val PARK = scan.next()
             val S_COMMENT = scan.next()
             val E_COMMENT = scan.next()
@@ -107,113 +110,64 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun RESPONCE(STATE:Int){
-        when(STATE){
-
-            1->{
-                Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_LONG).show()
-            }
-            2->{
-                Toast.makeText(applicationContext, "サーバーのエラーログを確認してください", Toast.LENGTH_LONG).show()
-            }
-            3->{
-                Toast.makeText(applicationContext, "サーバーに接続できません", Toast.LENGTH_LONG).show()
-            }
-
-        }
-    }
-
-
     fun setStatus(){
         //未来に登録されたデータがあれば次回利用時間を表示
         if(GLOBAL.RECORD.size>0){
 
-            for(i in 0..GLOBAL.RECORD.size-1){
-                var S_str=GLOBAL.RECORD[i].R_STARTDATE+GLOBAL.RECORD[i].R_STARTTIME
-                var S_date=S_str.split("年","月","日","時","分")
-                var E_str=GLOBAL.RECORD[i].R_ENDDATE+GLOBAL.RECORD[i].R_ENDTIME
-                var E_date=E_str.split("年","月","日","時","分")
-                val S_calendar:Calendar=Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
-                val E_calendar:Calendar=Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
+            while(GLOBAL.RECORD.size>0) {
+                var S_str = GLOBAL.RECORD[0].R_STARTDATE + GLOBAL.RECORD[0].R_STARTTIME
+                var S_date = S_str.split("年", "月", "日", "時", "分")
+                var E_str = GLOBAL.RECORD[0].R_ENDDATE + GLOBAL.RECORD[0].R_ENDTIME
+                var E_date = E_str.split("年", "月", "日", "時", "分")
+                val S_calendar: Calendar =
+                    Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
+                val E_calendar: Calendar =
+                    Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
 
-                S_calendar.set(Calendar.YEAR,S_date[0].toInt())
-                S_calendar.set(Calendar.MONTH,S_date[1].toInt()-1)
-                S_calendar.set(Calendar.DAY_OF_MONTH,S_date[2].toInt())
-                S_calendar.set(Calendar.HOUR_OF_DAY,S_date[3].toInt())
-                S_calendar.set(Calendar.MINUTE,S_date[4].toInt())
+                S_calendar.set(Calendar.YEAR, S_date[0].toInt())
+                S_calendar.set(Calendar.MONTH, S_date[1].toInt() - 1)
+                S_calendar.set(Calendar.DAY_OF_MONTH, S_date[2].toInt())
+                S_calendar.set(Calendar.HOUR_OF_DAY, S_date[3].toInt())
+                S_calendar.set(Calendar.MINUTE, S_date[4].toInt())
 
-                E_calendar.set(Calendar.YEAR,E_date[0].toInt())
-                E_calendar.set(Calendar.MONTH,E_date[1].toInt()-1)
-                E_calendar.set(Calendar.DAY_OF_MONTH,E_date[2].toInt())
-                E_calendar.set(Calendar.HOUR_OF_DAY,E_date[3].toInt())
-                E_calendar.set(Calendar.MINUTE,E_date[4].toInt())
-
-                //開始時刻が今より未来であれば次回利用を表示
-                val now=Calendar.getInstance()
-
-                if(E_calendar.before(now)){
-                    strNext.setText("利用予約はありません")
-                    findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
-                }
-                else if(S_calendar.before(now)){
-                    strNext.setText("返却予定："+GLOBAL.RECORD[i].R_ENDDATE+" "+GLOBAL.RECORD[i].R_ENDTIME)
-                    strStatus.setText("使用中")
-                    findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.use)
-                    break;
-                }
-                else{
-                    strNext.setText("次回利用："+GLOBAL.RECORD[i].R_STARTDATE+" "+GLOBAL.RECORD[i].R_STARTTIME)
-                    strStatus.setText("未使用")
-                    findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
-                    break;
-                }
-            }
-
-            while(GLOBAL.RECORD.size>0){
-                var S_str=GLOBAL.RECORD[0].R_STARTDATE+GLOBAL.RECORD[0].R_STARTTIME
-                var S_date=S_str.split("年","月","日","時","分")
-                var E_str=GLOBAL.RECORD[0].R_ENDDATE+GLOBAL.RECORD[0].R_ENDTIME
-                var E_date=E_str.split("年","月","日","時","分")
-                val S_calendar:Calendar=Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
-                val E_calendar:Calendar=Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
-
-                S_calendar.set(Calendar.YEAR,S_date[0].toInt())
-                S_calendar.set(Calendar.MONTH,S_date[1].toInt()-1)
-                S_calendar.set(Calendar.DAY_OF_MONTH,S_date[2].toInt())
-                S_calendar.set(Calendar.HOUR_OF_DAY,S_date[3].toInt())
-                S_calendar.set(Calendar.MINUTE,S_date[4].toInt())
-
-                E_calendar.set(Calendar.YEAR,E_date[0].toInt())
-                E_calendar.set(Calendar.MONTH,E_date[1].toInt()-1)
-                E_calendar.set(Calendar.DAY_OF_MONTH,E_date[2].toInt())
-                E_calendar.set(Calendar.HOUR_OF_DAY,E_date[3].toInt())
-                E_calendar.set(Calendar.MINUTE,E_date[4].toInt())
+                E_calendar.set(Calendar.YEAR, E_date[0].toInt())
+                E_calendar.set(Calendar.MONTH, E_date[1].toInt() - 1)
+                E_calendar.set(Calendar.DAY_OF_MONTH, E_date[2].toInt())
+                E_calendar.set(Calendar.HOUR_OF_DAY, E_date[3].toInt())
+                E_calendar.set(Calendar.MINUTE, E_date[4].toInt())
 
                 //開始時刻が今より未来であれば次回利用を表示
-                val now=Calendar.getInstance()
+                val now = Calendar.getInstance()
 
-                if(E_calendar.before(now)){
+                if (E_calendar.before(now)) {
                     GLOBAL.RECORD.removeAt(0)
-                }
-                else if(S_calendar.before(now)){
-                    strNext.setText("返却予定："+GLOBAL.RECORD[0].R_ENDDATE+" "+GLOBAL.RECORD[0].R_ENDTIME)
-                    strStatus.setText("使用中")
-                    findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.use)
+                } else if (S_calendar.before(now)) {
+                    mHandler.post(Runnable
+                    {
+                        strNext.setText("返却予定：" + GLOBAL.RECORD[0].R_ENDDATE + " " + GLOBAL.RECORD[0].R_ENDTIME)
+                        strStatus.setText("使用中")
+                        findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.use)
+                    })
                     break;
-                }
-                else{
-                    strNext.setText("次回利用："+GLOBAL.RECORD[0].R_STARTDATE+" "+GLOBAL.RECORD[0].R_STARTTIME)
-                    strStatus.setText("未使用")
-                    findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+                } else {
+                    mHandler.post(Runnable
+                    {
+                        strNext.setText("次回利用：" + GLOBAL.RECORD[0].R_STARTDATE + " " + GLOBAL.RECORD[0].R_STARTTIME)
+                        strStatus.setText("未使用")
+                        findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+                    })
                     break;
                 }
             }
-
-
         }
         else{
-            strNext.setText("利用予約はありません")
-            findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+            mHandler.post(Runnable
+            {
+                strStatus.setText("未使用")
+                strNext.setText("利用予約はありません")
+                findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+            })
+
         }
     }
 
@@ -242,6 +196,15 @@ class MainActivity : AppCompatActivity() {
                 if(r==2)findViewById<ImageView>(R.id.img_back).setImageResource(R.drawable.hiru2)
             }
         }
+    }
+
+    fun CreateHash(str:String):String {
+        var hash=str+"ROADSTAR"
+        return MessageDigest.getInstance("SHA-256")
+            .digest(hash.toByteArray())
+            .joinToString(separator = "") {
+                "%02x".format(it)
+            }
     }
 
 

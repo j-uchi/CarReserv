@@ -18,10 +18,6 @@ class MyApp: Application(){
 
     var NAME:String=""
 
-    var RESPONSE_STATE=-1
-
-    var RESPONSE_STR:String=""
-
 
     //開始時処理
     override fun onCreate(){
@@ -40,7 +36,6 @@ class MyApp: Application(){
 
     fun READFILE(){
         val GLOBAL=MyApp.getInstance()
-
         try{
             val file= File("$filesDir/", "setting.csv")
             val scan= Scanner(file)
