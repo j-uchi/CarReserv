@@ -90,7 +90,7 @@ class MainActivity : AppCompatActivity() {
         GLOBAL.RECORD[0].R_END_COMMENT=str
         GLOBAL.RECORD[0].R_REFUEL=ref
         GLOBAL.RECORD[0].R_ENDDATE=getDate()
-        GLOBAL.RECORD[0].R_ENDTIME=getTime()
+        GLOBAL.RECORD[0].R_ENDTIME=getTime(-1)
 
         val buf_s_date=GLOBAL.RECORD[0].R_STARTDATE.replace("年","/").replace("月","/").replace("日","")
         val buf_s_time=GLOBAL.RECORD[0].R_STARTTIME.replace("時",":").replace("分","")
@@ -346,9 +346,10 @@ class MainActivity : AppCompatActivity() {
         return format.format(date)
     }
 
-    fun getTime():String{
+    fun getTime(i:Int):String{
         val date= Calendar.getInstance()
         date.time= Date()
+        date.add(Calendar.HOUR,i)
         val df= SimpleDateFormat("HH時mm分")
         return df.format(date.time)
     }
