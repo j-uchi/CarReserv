@@ -50,6 +50,7 @@ class DispReserv : AppCompatActivity() {
         val R_COMMENT=""+strComment.getText().toString()//NULL対策
         GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",false)
         startActivity(Intent(this,DispSend::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish()
     }
 

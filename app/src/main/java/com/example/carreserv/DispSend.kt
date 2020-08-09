@@ -38,21 +38,20 @@ class DispSend : AppCompatActivity() {
         POSTDATA.put("refuel", GLOBAL.SEND_RECORD.R_REFUEL.toString())
         POSTDATA.put("hash", CreateHash(GLOBAL.SEND_RECORD.R_ID,GLOBAL.SEND_RECORD.R_STARTDATE,GLOBAL.SEND_RECORD.R_STARTTIME,GLOBAL.SEND_RECORD.R_ENDDATE,GLOBAL.SEND_RECORD.R_ENDTIME))
 
-
         "https://myapp.tokyo/carreserv/register.php".httpPost(POSTDATA.toList()).response { request, response, result ->
             when (result) {
                 is Result.Success -> {
                     if(String(response.data).indexOf("Query OK")!=-1){
                         mHandler.post(Runnable
                         {
-                            Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_LONG).show()
+                            Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_SHORT).show()
                             finish()
                         })
                     }
                     else{
                         mHandler.post(Runnable
                         {
-                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_LONG).show()
+                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
                             finish()
                         })
                     }
@@ -60,7 +59,7 @@ class DispSend : AppCompatActivity() {
                 is Result.Failure -> {
                     mHandler.post(Runnable
                     {
-                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_LONG).show()
+                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
                         finish()
                     })
                 }

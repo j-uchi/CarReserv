@@ -61,15 +61,18 @@ class MainActivity : AppCompatActivity() {
         "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { request, response, result ->
             when (result) {
                 is Result.Success -> {
-                    SETRECORD(String(response.data))
-                    swipe_refresh.isRefreshing=false
-                    setStatus()
+                    mHandler.post(Runnable
+                    {
+                        SETRECORD(String(response.data))
+                        swipe_refresh.isRefreshing=false
+                        setStatus()
+                        Toast.makeText(applicationContext, "更新しました", Toast.LENGTH_SHORT).show()
+                    })
                 }
                 is Result.Failure -> {
                     mHandler.post(Runnable
                     {
                         Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_LONG).show()
-                        finish()
                     })
                 }
             }
@@ -141,6 +144,12 @@ class MainActivity : AppCompatActivity() {
 
                 if (E_calendar.before(now)) {
                     GLOBAL.RECORD.removeAt(0)
+                    mHandler.post(Runnable
+                    {
+                        strNext.setText("利用予約はありません")
+                        strStatus.setText("未使用")
+                        findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+                    })
                 } else if (S_calendar.before(now)) {
                     mHandler.post(Runnable
                     {
