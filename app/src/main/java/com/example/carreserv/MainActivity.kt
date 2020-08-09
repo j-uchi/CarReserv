@@ -54,25 +54,47 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun REFLESH(){
+    fun getDate():String{
+        val date: Date = Date()
+        val format= SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
+        return format.format(date)
+    }
 
+    //情報再読み込み関数
+    fun REFLESH(){
         val POSTDATA = HashMap<String, String>()
-        POSTDATA.put("hash", CreateHash("test"))
+        POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
         "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { request, response, result ->
             when (result) {
                 is Result.Success -> {
-                    mHandler.post(Runnable
-                    {
-                        SETRECORD(String(response.data))
-                        swipe_refresh.isRefreshing=false
-                        setStatus()
-                        Toast.makeText(applicationContext, "更新しました", Toast.LENGTH_SHORT).show()
-                    })
+                    if(String(response.data).indexOf("SQL ERROR")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            swipe_refresh.isRefreshing=false
+                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
+                        })
+                    }
+                    else if(String(response.data).indexOf("HASH ERROR")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            swipe_refresh.isRefreshing=false
+                            Toast.makeText(applicationContext, "HASHエラー", Toast.LENGTH_SHORT).show()
+                        })
+                    }
+                    else{
+                        mHandler.post(Runnable
+                        {
+                            SETRECORD(String(response.data))
+                            setStatus()
+                            swipe_refresh.isRefreshing=false
+                            Toast.makeText(applicationContext, "更新しました", Toast.LENGTH_SHORT).show()
+                        })
+                    }
                 }
                 is Result.Failure -> {
                     mHandler.post(Runnable
                     {
-                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_LONG).show()
+                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
                     })
                 }
             }
