@@ -1,13 +1,16 @@
 package com.example.carreserv
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
@@ -30,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         val fab:View=findViewById(R.id.fab)
         fab.setOnClickListener{view->
             startActivity(Intent(this,DispReserv::class.java))
+        }
+        btnPark.setOnClickListener{view->
+            CreateParkDialog()
         }
         swipe_refresh.setOnRefreshListener{ REFLESH() }
     }
@@ -54,11 +60,91 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun getDate():String{
-        val date: Date = Date()
-        val format= SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
-        return format.format(date)
+    fun CreateParkDialog() {
+
+        val strList = arrayOf("給油済み")
+        val checkedItems = booleanArrayOf(false)
+        val myedit = EditText(this)
+        var dialogComment: String = ""
+        var dialogRefuel: Boolean = false
+
+        AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+            .setTitle("車を返却します")
+            .setMultiChoiceItems(strList, checkedItems, { dialog, which, isChecked ->
+                dialogRefuel = isChecked
+            })
+            .setView(myedit)
+            .setPositiveButton("OK", { dialog, which ->
+                dialogComment = myedit.getText().toString()
+                sendParkRequest(dialogComment,dialogRefuel)
+            })
+            .setNegativeButton("cancel", { dialog, which ->
+
+            })
+            .show()
     }
+
+    fun sendParkRequest(str:String,ref:Boolean){
+        val POSTDATA = HashMap<String, String>()
+
+        GLOBAL.RECORD[0].R_END_COMMENT=str
+        GLOBAL.RECORD[0].R_REFUEL=ref
+        GLOBAL.RECORD[0].R_ENDDATE=getDate()
+        GLOBAL.RECORD[0].R_ENDTIME=getTime()
+
+        val buf_s_date=GLOBAL.RECORD[0].R_STARTDATE.replace("年","/").replace("月","/").replace("日","")
+        val buf_s_time=GLOBAL.RECORD[0].R_STARTTIME.replace("時",":").replace("分","")
+        val buf_e_date=GLOBAL.RECORD[0].R_ENDDATE.replace("年","/").replace("月","/").replace("日","")
+        val buf_e_time=GLOBAL.RECORD[0].R_ENDTIME.replace("時",":").replace("分","")
+
+        POSTDATA.put("rid", GLOBAL.RECORD[0].R_RID)
+        POSTDATA.put("id", GLOBAL.RECORD[0].R_ID)
+        POSTDATA.put("name", GLOBAL.RECORD[0].R_NAME)
+        POSTDATA.put("s_date", buf_s_date)
+        POSTDATA.put("s_time", buf_s_time)
+        POSTDATA.put("e_date", buf_e_date)
+        POSTDATA.put("e_time", buf_e_time)
+        POSTDATA.put("park", GLOBAL.RECORD[0].R_PARK)
+        POSTDATA.put("s_comment", GLOBAL.RECORD[0].R_START_COMMENT)
+        POSTDATA.put("e_comment", GLOBAL.RECORD[0].R_END_COMMENT)
+        POSTDATA.put("refuel", GLOBAL.RECORD[0].R_REFUEL.toString())
+        POSTDATA.put("hash", CreateHash(GLOBAL.RECORD[0].R_ID+buf_s_date+buf_s_time+buf_e_date+buf_e_time))
+
+        "https://myapp.tokyo/carreserv/change.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+            when (result) {
+                is Result.Success -> {
+                    if(String(response.data).indexOf("SQL ERROR")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
+                        })
+                    }
+                    else if(String(response.data).indexOf("HASH ERROR")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            Toast.makeText(applicationContext, "HASHエラー", Toast.LENGTH_SHORT).show()
+                        })
+                    }
+                    else{
+                        mHandler.post(Runnable
+                        {
+                            Toast.makeText(applicationContext, "返却しました", Toast.LENGTH_SHORT).show()
+                            REFLESH()
+                        })
+                    }
+                }
+                is Result.Failure -> {
+                    print(String(response.data))
+                    mHandler.post(Runnable
+                    {
+                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                    })
+                }
+            }
+        }
+
+    }
+
 
     //情報再読み込み関数
     fun REFLESH(){
@@ -102,12 +188,12 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     fun SETRECORD(str:String){
         GLOBAL.RECORD.clear()
         val scan= Scanner(str)
         scan.useDelimiter(",")
         while(scan.hasNext()) {
+            val RID = scan.next()
             val ID = scan.next()
             val NAME = scan.next()
             val STARTDATE = scan.next().replaceFirst("-","年").replaceFirst("-","月")+"日"
@@ -120,6 +206,7 @@ class MainActivity : AppCompatActivity() {
             val REFUEL = scan.next().toBoolean()
             GLOBAL.RECORD.add(
                 MyApp.DC_RECORD(
+                    RID,
                     ID,
                     NAME,
                     STARTDATE,
@@ -171,13 +258,18 @@ class MainActivity : AppCompatActivity() {
                         strNext.setText("利用予約はありません")
                         strStatus.setText("未使用")
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+                        btnPark.setVisibility(View.INVISIBLE)
                     })
                 } else if (S_calendar.before(now)) {
                     mHandler.post(Runnable
                     {
                         strNext.setText("返却予定：" + GLOBAL.RECORD[0].R_ENDDATE + " " + GLOBAL.RECORD[0].R_ENDTIME)
-                        strStatus.setText("使用中")
+                        strStatus.setText(GLOBAL.RECORD[0].R_NAME+"が使用中")
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.use)
+                        btnPark.setVisibility(View.INVISIBLE)
+                        if(GLOBAL.RECORD[0].R_ID==getID()){
+                            btnPark.setVisibility(View.VISIBLE)
+                        }
                     })
                     break;
                 } else {
@@ -186,6 +278,7 @@ class MainActivity : AppCompatActivity() {
                         strNext.setText("次回利用：" + GLOBAL.RECORD[0].R_STARTDATE + " " + GLOBAL.RECORD[0].R_STARTTIME)
                         strStatus.setText("未使用")
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+                        btnPark.setVisibility(View.INVISIBLE)
                     })
                     break;
                 }
@@ -197,6 +290,7 @@ class MainActivity : AppCompatActivity() {
                 strStatus.setText("未使用")
                 strNext.setText("利用予約はありません")
                 findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+                btnPark.setVisibility(View.INVISIBLE)
             })
 
         }
@@ -236,6 +330,27 @@ class MainActivity : AppCompatActivity() {
             .joinToString(separator = "") {
                 "%02x".format(it)
             }
+    }
+
+    fun getID():String{
+        var ID:String= Build.ID
+        if(ID.length>10){
+            ID=ID.substring(0,9)
+        }
+        return ID
+    }
+
+    fun getDate():String{
+        val date: Date = Date()
+        val format= SimpleDateFormat("yyyy年MM月dd日", Locale.getDefault())
+        return format.format(date)
+    }
+
+    fun getTime():String{
+        val date= Calendar.getInstance()
+        date.time= Date()
+        val df= SimpleDateFormat("HH時mm分")
+        return df.format(date.time)
     }
 
 
