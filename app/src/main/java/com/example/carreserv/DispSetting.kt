@@ -17,6 +17,7 @@ class DispSetting : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         strName.setText(GLOBAL.NAME)
         btnSetName.setOnClickListener{SetName()}
+        txtTest.setOnClickListener{SetName()}
     }
 
 

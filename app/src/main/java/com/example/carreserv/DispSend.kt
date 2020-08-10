@@ -65,7 +65,6 @@ class DispSend : AppCompatActivity() {
                 }
             }
         }
-
     }
 
     fun CreateHash(ID:String,S_D:String,S_T:String,E_D:String,E_T:String):String {

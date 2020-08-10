@@ -30,6 +30,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         RandomBackGround()
         REFLESH()
+
+        //追加ボタンリスナークラス
         val fab:View=findViewById(R.id.fab)
         fab.setOnClickListener{view->
             startActivity(Intent(this,DispReserv::class.java))
@@ -39,10 +41,14 @@ class MainActivity : AppCompatActivity() {
         }
         swipe_refresh.setOnRefreshListener{ REFLESH() }
     }
+
+
+
     //再アクティブ時動作
     override fun onRestart() {
         super.onRestart()
         RandomBackGround()
+        REFLESH()
     }
     //メニューボタン生成
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -260,7 +266,7 @@ class MainActivity : AppCompatActivity() {
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
                         btnPark.setVisibility(View.INVISIBLE)
                     })
-                } else if (S_calendar.before(now)) {
+                } else if (S_calendar.before(now)||S_calendar.equals(now)) {
                     mHandler.post(Runnable
                     {
                         strNext.setText("返却予定：" + GLOBAL.RECORD[0].R_ENDDATE + " " + GLOBAL.RECORD[0].R_ENDTIME)
