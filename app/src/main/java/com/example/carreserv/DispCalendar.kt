@@ -95,13 +95,13 @@ class DispCalendar : AppCompatActivity() {
             fuel="（ 給油済 ）"
         }
         AlertDialog.Builder(this)
-            .setTitle("利用者:"+GLOBAL.RECORD[num].R_NAME)
+            .setTitle("利用者 : "+GLOBAL.RECORD[num].R_NAME)
             .setMessage("\n開始 : "+GLOBAL.RECORD[num].R_STARTDATE+"　"+GLOBAL.RECORD[num].R_STARTTIME+"\n"+
                     "返却 : "+GLOBAL.RECORD[num].R_ENDDATE+"　"+GLOBAL.RECORD[num].R_ENDTIME+"\n\n" +
                     "返却場所:"+GLOBAL.RECORD[num].R_PARK+"　　　"+fuel+"\n\n\n" +
                     "開始時コメント:"+GLOBAL.RECORD[num].R_START_COMMENT+"\n\n\n" +
                     "返却時コメント:"+GLOBAL.RECORD[num].R_START_COMMENT)
-            .setPositiveButton("OK"){dialog,which->}
+            //.setPositiveButton("OK"){dialog,which->}
             .create()
             .show()
     }
