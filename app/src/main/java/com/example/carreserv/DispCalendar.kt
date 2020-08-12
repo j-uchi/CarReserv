@@ -83,11 +83,10 @@ class DispCalendar : AppCompatActivity() {
                 layout.addView(space1,LinearLayout.LayoutParams(50,50))
 
                 layout.addView(framelayout1,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
-                framelayout1.addView(sizetext)
-                framelayout1.addView(framelayout2,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
-                framelayout2.addView(image2,LinearLayout.LayoutParams(WRAP_CONTENT,MATCH_PARENT))
-                framelayout2.addView(image,LinearLayout.LayoutParams(WRAP_CONTENT,MATCH_PARENT))
-                framelayout2.addView(text,LinearLayout.LayoutParams(MATCH_PARENT,MATCH_PARENT))
+                framelayout1.addView(text,LinearLayout.LayoutParams(MATCH_PARENT,MATCH_PARENT))
+                linearlayout.addView(image,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
+                linearlayout.addView(image2,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
+
 
                 text.setOnClickListener{
                     SelectRecord(it.getTag().toString().toInt())
