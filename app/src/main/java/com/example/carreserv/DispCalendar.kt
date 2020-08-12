@@ -71,6 +71,7 @@ class DispCalendar : AppCompatActivity() {
                 val image=ImageView(this)
                 val image2=ImageView(this)
                 image.setImageResource(R.drawable.ic_people)
+                image2.setImageResource(R.drawable.ic_people)
                 sizetext.text=""
                 sizetext.textSize=32F
                 text.text=GLOBAL.RECORD[i].R_STARTTIME+"　～　"+GLOBAL.RECORD[i].R_ENDTIME
@@ -84,6 +85,7 @@ class DispCalendar : AppCompatActivity() {
                 layout.addView(framelayout1,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
                 framelayout1.addView(sizetext)
                 framelayout1.addView(framelayout2,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
+                framelayout2.addView(image2,LinearLayout.LayoutParams(WRAP_CONTENT,MATCH_PARENT))
                 framelayout2.addView(image,LinearLayout.LayoutParams(WRAP_CONTENT,MATCH_PARENT))
                 framelayout2.addView(text,LinearLayout.LayoutParams(MATCH_PARENT,MATCH_PARENT))
 
