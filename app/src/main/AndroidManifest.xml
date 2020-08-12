@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".DispEdit"></activity>
         <activity android:name=".DispSend" />
         <activity android:name=".DispSetting" />
         <activity android:name=".DispCalendar" />

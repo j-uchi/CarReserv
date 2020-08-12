@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DispReserv">
+    tools:context=".DispEdit">
 
     <ScrollView
         android:layout_width="0dp"
@@ -123,7 +123,6 @@
                     android:layout_marginEnd="32dp"
                     android:layout_marginRight="32dp"
                     android:layout_marginBottom="16dp"
-                    android:text="東比恵"
                     android:textSize="30sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -160,7 +159,7 @@
                     android:layout_height="120dp"
                     android:layout_marginTop="32dp"
                     android:layout_marginBottom="24dp"
-                    android:text="予約"
+                    android:text="変更"
                     android:textSize="36sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -170,5 +169,4 @@
 
         </LinearLayout>
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

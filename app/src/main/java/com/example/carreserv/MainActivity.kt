@@ -179,7 +179,6 @@ class MainActivity : AppCompatActivity() {
                             SETRECORD(String(response.data))
                             setStatus()
                             swipe_refresh.isRefreshing=false
-                            Toast.makeText(applicationContext, "更新しました", Toast.LENGTH_SHORT).show()
                         })
                     }
                 }
@@ -231,11 +230,10 @@ class MainActivity : AppCompatActivity() {
     fun setStatus(){
         //未来に登録されたデータがあれば次回利用時間を表示
         if(GLOBAL.RECORD.size>0){
-
-            while(GLOBAL.RECORD.size>0) {
-                var S_str = GLOBAL.RECORD[0].R_STARTDATE + GLOBAL.RECORD[0].R_STARTTIME
+            for(i in GLOBAL.RECORD.indices){
+                var S_str = GLOBAL.RECORD[i].R_STARTDATE + GLOBAL.RECORD[i].R_STARTTIME
                 var S_date = S_str.split("年", "月", "日", "時", "分")
-                var E_str = GLOBAL.RECORD[0].R_ENDDATE + GLOBAL.RECORD[0].R_ENDTIME
+                var E_str = GLOBAL.RECORD[i].R_ENDDATE + GLOBAL.RECORD[i].R_ENDTIME
                 var E_date = E_str.split("年", "月", "日", "時", "分")
                 val S_calendar: Calendar =
                     Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
@@ -258,7 +256,6 @@ class MainActivity : AppCompatActivity() {
                 val now = Calendar.getInstance()
 
                 if (E_calendar.before(now)) {
-                    GLOBAL.RECORD.removeAt(0)
                     mHandler.post(Runnable
                     {
                         strNext.setText("利用予約はありません")
@@ -269,11 +266,11 @@ class MainActivity : AppCompatActivity() {
                 } else if (S_calendar.before(now)||S_calendar.equals(now)) {
                     mHandler.post(Runnable
                     {
-                        strNext.setText("返却予定：" + GLOBAL.RECORD[0].R_ENDDATE + " " + GLOBAL.RECORD[0].R_ENDTIME)
-                        strStatus.setText(GLOBAL.RECORD[0].R_NAME+"が使用中")
+                        strNext.setText("返却予定：" + GLOBAL.RECORD[i].R_ENDDATE + " " + GLOBAL.RECORD[i].R_ENDTIME)
+                        strStatus.setText(GLOBAL.RECORD[i].R_NAME+"が使用中")
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.use)
                         btnPark.setVisibility(View.INVISIBLE)
-                        if(GLOBAL.RECORD[0].R_ID==getID()){
+                        if(GLOBAL.RECORD[i].R_ID==getID()){
                             btnPark.setVisibility(View.VISIBLE)
                         }
                     })
@@ -281,7 +278,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     mHandler.post(Runnable
                     {
-                        strNext.setText("次回利用：" + GLOBAL.RECORD[0].R_STARTDATE + " " + GLOBAL.RECORD[0].R_STARTTIME)
+                        strNext.setText("次回利用：" + GLOBAL.RECORD[i].R_STARTDATE + " " + GLOBAL.RECORD[i].R_STARTTIME)
                         strStatus.setText("未使用")
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
                         btnPark.setVisibility(View.INVISIBLE)

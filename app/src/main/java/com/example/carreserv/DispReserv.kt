@@ -2,17 +2,14 @@ package com.example.carreserv
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.telephony.TelephonyManager
 import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_disp_reserv.*
-import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -35,7 +32,7 @@ class DispReserv : AppCompatActivity() {
         btn_EndDate.setOnClickListener{showDatePicker(btn_EndDate)}
         btn_EndTime.setOnClickListener{showTimePicker(btn_EndTime)}
         btnPark.setOnClickListener{ CreateDialog() }
-        btnReserv.setOnClickListener{PushData()}
+        btnEdit.setOnClickListener{PushData()}
 
     }
 
@@ -182,7 +179,7 @@ class DispReserv : AppCompatActivity() {
         val df= SimpleDateFormat("HH時mm分")
         return df.format(date.time)
     }
-
+    //左上戻るボタンのリスナー設定
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item?.itemId){
             android.R.id.home->{

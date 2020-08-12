@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">CarReserv</string>
     <string name="calendar">calendar</string>
+    <string name="delete">予約を削除</string>
 </resources>

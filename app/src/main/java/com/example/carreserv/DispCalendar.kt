@@ -1,5 +1,6 @@
 package com.example.carreserv
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
@@ -85,7 +86,7 @@ class DispCalendar : AppCompatActivity() {
         }
         //未来の予定であれば削除や編集ボタンを含めたダイアログを表示
         else{
-
+            CreateDialog_Future(num)
         }
     }
 
@@ -95,8 +96,9 @@ class DispCalendar : AppCompatActivity() {
             fuel="（ 給油済 ）"
         }
         AlertDialog.Builder(this)
-            .setTitle("利用者 : "+GLOBAL.RECORD[num].R_NAME)
-            .setMessage("\n開始 : "+GLOBAL.RECORD[num].R_STARTDATE+"　"+GLOBAL.RECORD[num].R_STARTTIME+"\n"+
+            .setTitle("利用履歴")
+            .setMessage("\n名前 : "+GLOBAL.RECORD[num].R_NAME +"\n\n"+
+                    "\n開始 : "+GLOBAL.RECORD[num].R_STARTDATE+"　"+GLOBAL.RECORD[num].R_STARTTIME+"\n"+
                     "返却 : "+GLOBAL.RECORD[num].R_ENDDATE+"　"+GLOBAL.RECORD[num].R_ENDTIME+"\n\n" +
                     "返却場所:"+GLOBAL.RECORD[num].R_PARK+"　　　"+fuel+"\n\n\n" +
                     "開始時コメント:"+GLOBAL.RECORD[num].R_START_COMMENT+"\n\n\n" +
@@ -106,8 +108,21 @@ class DispCalendar : AppCompatActivity() {
             .show()
     }
 
-    fun CreateDialog_Future(){
-
+    fun CreateDialog_Future(num:Int){
+        AlertDialog.Builder(this)
+            .setTitle("利用予定")
+            .setMessage("\n名前 : "+GLOBAL.RECORD[num].R_NAME +"\n\n"+
+                    "開始 : "+GLOBAL.RECORD[num].R_STARTDATE+"　"+GLOBAL.RECORD[num].R_STARTTIME+"\n"+
+                    "返却 : "+GLOBAL.RECORD[num].R_ENDDATE+"　"+GLOBAL.RECORD[num].R_ENDTIME+"\n\n" +
+                    "開始時コメント:"+GLOBAL.RECORD[num].R_START_COMMENT)
+            .setPositiveButton("編集",{dialog,which->
+                intent= Intent(this,DispEdit::class.java)
+                intent.putExtra("num",num)
+                startActivity(intent)
+            })
+            .setNegativeButton("キャンセル", { dialog, which ->})
+            .create()
+            .show()
     }
 
     fun getDateString(year:Int,month:Int,day:Int):String{
