@@ -12,7 +12,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".DispUpdate"></activity>
+        <activity android:name=".MainActivity2"></activity>
+        <activity android:name=".DispUpdate" />
         <activity android:name=".DispEdit" />
         <activity android:name=".DispSend" />
         <activity android:name=".DispSetting" />

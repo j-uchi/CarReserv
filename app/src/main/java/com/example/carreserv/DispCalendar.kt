@@ -1,15 +1,19 @@
 package com.example.carreserv
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.FILL_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.activity_disp_calendar.*
+import kotlinx.android.synthetic.main.activity_disp_send.*
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -59,13 +63,26 @@ class DispCalendar : AppCompatActivity() {
         for(i in GLOBAL.RECORD.indices){
             if(GLOBAL.RECORD[i].R_STARTDATE==cal){
                 val text=TextView(this)
-                val space= Space(this)
+                val space1= Space(this)
+                val space2= Space(this)
+                val space3= Space(this)
+                val space4= Space(this)
+                val linearlayout=LinearLayout(this)
+                val image=ImageView(this)
+                linearlayout.gravity=Gravity.CENTER_HORIZONTAL
+                image.setImageResource(R.drawable.ic_people)
                 text.text=GLOBAL.RECORD[i].R_STARTTIME+"　～　"+GLOBAL.RECORD[i].R_ENDTIME
-                text.gravity= Gravity.CENTER
-                text.textSize=30F
+                text.setTextColor(Color.parseColor("#d2d2d2"))
+                text.textSize=32F
+                text.gravity=Gravity.CENTER
                 text.setTag(i)
-                layout.addView(space,LinearLayout.LayoutParams(50,50))
-                layout.addView(text)
+                layout.addView(space1,LinearLayout.LayoutParams(50,50))
+                layout.addView(linearlayout)
+                linearlayout.addView(space2,LinearLayout.LayoutParams(0,WRAP_CONTENT,1F))
+                linearlayout.addView(image,LinearLayout.LayoutParams(0, WRAP_CONTENT, 1F))
+                linearlayout.addView(space3,LinearLayout.LayoutParams(0,WRAP_CONTENT,1F))
+                linearlayout.addView(text,LinearLayout.LayoutParams(0,WRAP_CONTENT, 15F))
+                linearlayout.addView(space4,LinearLayout.LayoutParams(0,WRAP_CONTENT,1F))
                 text.setOnClickListener{
                     SelectRecord(it.getTag().toString().toInt())
                 }
