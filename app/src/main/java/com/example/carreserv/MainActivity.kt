@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         RandomBackGround()
-        REFLESH()
+        REFLESH(true)
 
         //追加ボタンリスナークラス
         val fab:View=findViewById(R.id.fab)
@@ -39,7 +39,10 @@ class MainActivity : AppCompatActivity() {
         btnPark.setOnClickListener{view->
             CreateParkDialog()
         }
-        swipe_refresh.setOnRefreshListener{ REFLESH() }
+        swipe_refresh.setOnRefreshListener{
+            REFLESH(true)
+            swipe_refresh.isRefreshing=false
+        }
     }
 
 
@@ -48,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     override fun onRestart() {
         super.onRestart()
         RandomBackGround()
-        REFLESH()
+        REFLESH(false)
     }
     //メニューボタン生成
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -93,32 +96,33 @@ class MainActivity : AppCompatActivity() {
     fun sendParkRequest(str:String,ref:Boolean){
         val POSTDATA = HashMap<String, String>()
 
-        GLOBAL.RECORD[0].R_END_COMMENT=str
-        GLOBAL.RECORD[0].R_REFUEL=ref
-        GLOBAL.RECORD[0].R_ENDDATE=getDate()
-        GLOBAL.RECORD[0].R_ENDTIME=getTime(-1)
+        GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_END_COMMENT=str
+        GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_REFUEL=ref
+        GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_ENDDATE=getDate()
+        GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_ENDTIME=getTime(-1)
 
-        val buf_s_date=GLOBAL.RECORD[0].R_STARTDATE.replace("年","/").replace("月","/").replace("日","")
-        val buf_s_time=GLOBAL.RECORD[0].R_STARTTIME.replace("時",":").replace("分","")
-        val buf_e_date=GLOBAL.RECORD[0].R_ENDDATE.replace("年","/").replace("月","/").replace("日","")
-        val buf_e_time=GLOBAL.RECORD[0].R_ENDTIME.replace("時",":").replace("分","")
+        val buf_s_date=GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_STARTDATE.replace("年","/").replace("月","/").replace("日","")
+        val buf_s_time=GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_STARTTIME.replace("時",":").replace("分","")
+        val buf_e_date=GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_ENDDATE.replace("年","/").replace("月","/").replace("日","")
+        val buf_e_time=GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_ENDTIME.replace("時",":").replace("分","")
 
-        POSTDATA.put("rid", GLOBAL.RECORD[0].R_RID)
-        POSTDATA.put("id", GLOBAL.RECORD[0].R_ID)
-        POSTDATA.put("name", GLOBAL.RECORD[0].R_NAME)
+        POSTDATA.put("rid", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_RID)
+        POSTDATA.put("id", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_ID)
+        POSTDATA.put("name", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_NAME)
         POSTDATA.put("s_date", buf_s_date)
         POSTDATA.put("s_time", buf_s_time)
         POSTDATA.put("e_date", buf_e_date)
         POSTDATA.put("e_time", buf_e_time)
-        POSTDATA.put("park", GLOBAL.RECORD[0].R_PARK)
-        POSTDATA.put("s_comment", GLOBAL.RECORD[0].R_START_COMMENT)
-        POSTDATA.put("e_comment", GLOBAL.RECORD[0].R_END_COMMENT)
-        POSTDATA.put("refuel", GLOBAL.RECORD[0].R_REFUEL.toString())
-        POSTDATA.put("hash", CreateHash(GLOBAL.RECORD[0].R_ID+buf_s_date+buf_s_time+buf_e_date+buf_e_time))
+        POSTDATA.put("park", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_PARK)
+        POSTDATA.put("s_comment", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_START_COMMENT)
+        POSTDATA.put("e_comment", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_END_COMMENT)
+        POSTDATA.put("refuel", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_REFUEL.toString())
+        POSTDATA.put("hash", CreateHash(GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_ID+buf_s_date+buf_s_time+buf_e_date+buf_e_time))
 
         "https://myapp.tokyo/carreserv/change.php".httpPost(POSTDATA.toList()).response { request, response, result ->
             when (result) {
                 is Result.Success -> {
+                    print(String(response.data))
                     if(String(response.data).indexOf("SQL ERROR")!=-1){
                         mHandler.post(Runnable
                         {
@@ -135,7 +139,7 @@ class MainActivity : AppCompatActivity() {
                         mHandler.post(Runnable
                         {
                             Toast.makeText(applicationContext, "返却しました", Toast.LENGTH_SHORT).show()
-                            REFLESH()
+                            REFLESH(false)
                         })
                     }
                 }
@@ -148,12 +152,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
     }
 
 
     //情報再読み込み関数
-    fun REFLESH(){
+    fun REFLESH(toastFlag:Boolean){
         val POSTDATA = HashMap<String, String>()
         POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
         "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { request, response, result ->
@@ -162,15 +165,13 @@ class MainActivity : AppCompatActivity() {
                     if(String(response.data).indexOf("SQL ERROR")!=-1){
                         mHandler.post(Runnable
                         {
-                            swipe_refresh.isRefreshing=false
-                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
+                            if(toastFlag)Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
                         })
                     }
                     else if(String(response.data).indexOf("HASH ERROR")!=-1){
                         mHandler.post(Runnable
                         {
-                            swipe_refresh.isRefreshing=false
-                            Toast.makeText(applicationContext, "HASHエラー", Toast.LENGTH_SHORT).show()
+                            if(toastFlag)Toast.makeText(applicationContext, "HASHエラー", Toast.LENGTH_SHORT).show()
                         })
                     }
                     else{
@@ -178,14 +179,13 @@ class MainActivity : AppCompatActivity() {
                         {
                             SETRECORD(String(response.data))
                             setStatus()
-                            swipe_refresh.isRefreshing=false
                         })
                     }
                 }
                 is Result.Failure -> {
                     mHandler.post(Runnable
                     {
-                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                        if(toastFlag)Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
                     })
                 }
             }
@@ -266,11 +266,12 @@ class MainActivity : AppCompatActivity() {
                 } else if (S_calendar.before(now)||S_calendar.equals(now)) {
                     mHandler.post(Runnable
                     {
+                        GLOBAL.nowRecordNumber=i
                         strNext.setText("返却予定：" + GLOBAL.RECORD[i].R_ENDDATE + " " + GLOBAL.RECORD[i].R_ENDTIME)
                         strStatus.setText(GLOBAL.RECORD[i].R_NAME+"が使用中")
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.use)
                         btnPark.setVisibility(View.INVISIBLE)
-                        if(GLOBAL.RECORD[i].R_ID==getID()){
+                        if(GLOBAL.RECORD[i].R_ID==GLOBAL.userID){
                             btnPark.setVisibility(View.VISIBLE)
                         }
                     })
@@ -278,6 +279,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     mHandler.post(Runnable
                     {
+                        GLOBAL.nowRecordNumber=i
                         strNext.setText("次回利用：" + GLOBAL.RECORD[i].R_STARTDATE + " " + GLOBAL.RECORD[i].R_STARTTIME)
                         strStatus.setText("未使用")
                         findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
@@ -335,13 +337,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    fun getID():String{
-        var ID:String= Build.ID
-        if(ID.length>10){
-            ID=ID.substring(0,9)
-        }
-        return ID
-    }
+
 
     fun getDate():String{
         val date: Date = Date()

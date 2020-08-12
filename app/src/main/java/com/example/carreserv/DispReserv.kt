@@ -38,7 +38,7 @@ class DispReserv : AppCompatActivity() {
 
     fun PushData(){
         val R_RID="0"
-        val R_ID=getID()
+        val R_ID=GLOBAL.userID
         val R_NAME=GLOBAL.NAME
         val R_START_DATE=btn_StartDate.getText().toString().replace("年","/").replace("月","/").replace("日","")
         val R_START_TIME=btn_StartTime.getText().toString().replace("時",":").replace("分","")
@@ -50,16 +50,6 @@ class DispReserv : AppCompatActivity() {
         startActivity(Intent(this,DispSend::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish()
-    }
-
-
-
-    fun getID():String{
-        var ID:String=Build.ID
-        if(ID.length>10){
-            ID=ID.substring(0,9)
-        }
-        return ID
     }
 
 

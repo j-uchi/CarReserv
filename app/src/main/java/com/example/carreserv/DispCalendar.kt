@@ -16,6 +16,7 @@ import java.util.*
 class DispCalendar : AppCompatActivity() {
 
     val GLOBAL=MyApp.getInstance()
+    var NowOpenRecordDay:String=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +46,12 @@ class DispCalendar : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    //再アクティブ時動作
+    override fun onRestart() {
+        super.onRestart()
+        if(NowOpenRecordDay!=""){CreateRecordList(NowOpenRecordDay)}
+    }
+
     fun CreateRecordList(cal:String){
         val layout=findViewById<View>(R.id.ScrollView)as ViewGroup
         layout.removeAllViews()
@@ -60,11 +67,11 @@ class DispCalendar : AppCompatActivity() {
                 layout.addView(space,LinearLayout.LayoutParams(50,50))
                 layout.addView(text)
                 text.setOnClickListener{
-                    Toast.makeText(applicationContext, "tap is$i", Toast.LENGTH_SHORT).show()
                     SelectRecord(it.getTag().toString().toInt())
                 }
             }//if end
         }//for end
+        NowOpenRecordDay=cal
     }
 
     fun SelectRecord(num:Int){
@@ -81,10 +88,16 @@ class DispCalendar : AppCompatActivity() {
         S_calendar.set(Calendar.MINUTE, S_date[4].toInt())
 
         //現在時刻より過去であれば参照ダイアログを表示
-        if(S_calendar.before(now)||S_calendar.equals(now)){
+        if(S_calendar.before(now)){
+            CreateDialog_Past(num)
+        }
+        else if(S_calendar.equals(now)){
             CreateDialog_Past(num)
         }
         //未来の予定であれば削除や編集ボタンを含めたダイアログを表示
+        else if(GLOBAL.RECORD[num].R_ID!=GLOBAL.userID){//もしidが別の人ならNG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            CreateDialog_Past(num)
+        }
         else{
             CreateDialog_Future(num)
         }

@@ -1,6 +1,7 @@
 package com.example.carreserv
 
 import android.app.Application
+import android.os.Build
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.Serializable
@@ -16,14 +17,17 @@ class MyApp: Application(){
 
     var SEND_RECORD:DC_RECORD=DC_RECORD("","","","","","","","","","",false)
 
+    var userID:String=""
     var NAME:String=""
 
-    var test:Boolean=false
+    var nowRecordNumber=0
 
 
     //開始時処理
     override fun onCreate(){
+        val GLOBAL=MyApp.getInstance()
         super.onCreate()
+        GLOBAL.userID=getID()
         READFILE()
     }
 
@@ -50,6 +54,14 @@ class MyApp: Application(){
             cacheFile.writeText("guest")
             GLOBAL.NAME="guest"
         }
+    }
+
+    fun getID():String{
+        var ID:String= Build.ID
+        if(ID.length>10){
+            ID=ID.substring(0,10)
+        }
+        return ID
     }
 
 

@@ -2,18 +2,37 @@ package com.example.carreserv
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
+import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.result.Result
 import kotlinx.android.synthetic.main.activity_disp_edit.*
+import kotlinx.android.synthetic.main.activity_disp_edit.btnEdit
+import kotlinx.android.synthetic.main.activity_disp_edit.btnPark
+import kotlinx.android.synthetic.main.activity_disp_edit.btn_EndDate
+import kotlinx.android.synthetic.main.activity_disp_edit.btn_EndTime
+import kotlinx.android.synthetic.main.activity_disp_edit.btn_StartDate
+import kotlinx.android.synthetic.main.activity_disp_edit.btn_StartTime
+import kotlinx.android.synthetic.main.activity_disp_edit.strComment
+import kotlinx.android.synthetic.main.activity_disp_reserv.*
+import kotlinx.android.synthetic.main.activity_main.*
+import java.security.MessageDigest
+import java.text.SimpleDateFormat
 import java.util.*
 
 class DispEdit : AppCompatActivity() {
 
     val GLOBAL=MyApp.getInstance()
+    var mHandler= Handler()
+    var SelectNum=0
 
 
     //起動時動作
@@ -26,9 +45,9 @@ class DispEdit : AppCompatActivity() {
         btn_EndDate.setOnClickListener{showDatePicker(btn_EndDate)}
         btn_EndTime.setOnClickListener{showTimePicker(btn_EndTime)}
         btnPark.setOnClickListener{ CreateDialog() }
-        btnEdit.setOnClickListener{}
-        val num:Int=intent.getIntExtra("num",0)
-        setData(num)
+        btnEdit.setOnClickListener{ UpdateRecord()}
+        SelectNum=intent.getIntExtra("num",0)
+        setData(SelectNum)
     }
     //メニューボタン生成
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -42,10 +61,65 @@ class DispEdit : AppCompatActivity() {
                 finish()
             }
             R.id.menu_delete->{
-
+                DeleteRecord()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun UpdateRecord(){
+        val R_RID=GLOBAL.RECORD[SelectNum].R_RID
+        val R_ID=GLOBAL.userID
+        val R_NAME=GLOBAL.NAME
+        val R_START_DATE=btn_StartDate.getText().toString().replace("年","/").replace("月","/").replace("日","")
+        val R_START_TIME=btn_StartTime.getText().toString().replace("時",":").replace("分","")
+        val R_END_DATE=btn_EndDate.getText().toString().replace("年","/").replace("月","/").replace("日","")
+        val R_END_TIME=btn_EndTime.getText().toString().replace("時",":").replace("分","")
+        val R_PARK=btnPark.getText().toString()
+        val R_COMMENT=""+strComment.getText().toString()//NULL対策
+        GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",false)
+        startActivity(Intent(this,DispUpdate::class.java))
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        finish()
+    }
+
+    fun DeleteRecord(){
+        val POSTDATA = HashMap<String, String>()
+        POSTDATA.put("rid", GLOBAL.RECORD[SelectNum].R_RID)
+        POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
+        "https://myapp.tokyo/carreserv/delete.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+            when (result) {
+                is Result.Success -> {
+                    if(String(response.data).indexOf("SQL ERROR")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            print("--------------------"+String(response.data))
+                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
+                        })
+                    }
+                    else if(String(response.data).indexOf("HASH ERROR")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            Toast.makeText(applicationContext, "HASHエラー", Toast.LENGTH_SHORT).show()
+                        })
+                    }
+                    else{
+                        mHandler.post(Runnable
+                        {
+                            GLOBAL.RECORD.removeAt(SelectNum)
+                            Toast.makeText(applicationContext, "削除しました", Toast.LENGTH_SHORT).show()
+                            finish()
+                        })
+                    }
+                }
+                is Result.Failure -> {
+                    mHandler.post(Runnable
+                    {
+                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                    })
+                }
+            }
+        }
     }
     fun setData(num:Int){
         btn_StartDate.setText(GLOBAL.RECORD[num].R_STARTDATE)
@@ -153,5 +227,13 @@ class DispEdit : AppCompatActivity() {
         datePickerDialog.setCanceledOnTouchOutside(false)
         datePickerDialog.setCancelable(false)
         datePickerDialog.show()
+    }
+    fun CreateHash(str:String):String {
+        var hash=str+"ROADSTAR"
+        return MessageDigest.getInstance("SHA-256")
+            .digest(hash.toByteArray())
+            .joinToString(separator = "") {
+                "%02x".format(it)
+            }
     }
 }
