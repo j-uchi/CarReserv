@@ -136,10 +136,18 @@ class DispReserv : AppCompatActivity() {
         val timePickerDialog = TimePickerDialog(
             this,
             TimePickerDialog.OnTimeSetListener() {view, hour, minutes->
-                str="${hour}時${minutes}分"
-                r1.setText(str)
-                str="${hour+3}時${minutes}分"
-                r2.setText(str)
+                if(hour>=21){
+                    str="${hour}時${minutes}分"
+                    r1.setText(str)
+                    str="23時59分"
+                    r2.setText(str)
+                }
+                else{
+                    str="${hour}時${minutes}分"
+                    r1.setText(str)
+                    str="${hour+3}時${minutes}分"
+                    r2.setText(str)
+                }
             },
             C_Hour,
             C_Minuts,
@@ -165,7 +173,14 @@ class DispReserv : AppCompatActivity() {
     fun getTime(i:Int):String{
         val date= Calendar.getInstance()
         date.time= Date()
-        date.add(Calendar.HOUR,i)
+        var a=date.get(Calendar.HOUR_OF_DAY)
+        if(date.get(Calendar.HOUR_OF_DAY)+i>=24){
+            date.add(Calendar.HOUR,23-date.get(Calendar.HOUR_OF_DAY))
+            date.add(Calendar.MINUTE,59-date.get(Calendar.MINUTE))
+        }
+        else{
+            date.add(Calendar.HOUR,i)
+        }
         val df= SimpleDateFormat("HH時mm分")
         return df.format(date.time)
     }

@@ -22,10 +22,10 @@ class DispSend : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_disp_send)
-        SEND_DATA()
+        SEND_DATA(0)
     }
 
-    fun SEND_DATA(){
+    fun SEND_DATA(n:Int){
 
         val POSTDATA = HashMap<String, String>()
 
@@ -55,15 +55,16 @@ class DispSend : AppCompatActivity() {
                     else{
                         mHandler.post(Runnable
                         {
-                            print(String(response.data))
-                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
+                            if(n<3) SEND_DATA(n+1)
+                            else Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
                         })
                     }
                 }
                 is Result.Failure -> {
                     mHandler.post(Runnable
                     {
-                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                        if(n<3) SEND_DATA(n+1)
+                        else Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
                     })
                 }
             }

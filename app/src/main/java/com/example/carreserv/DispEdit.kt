@@ -71,7 +71,8 @@ class DispEdit : AppCompatActivity() {
         AlertDialog.Builder(this) // FragmentではActivityを取得して生成
             .setTitle("この予定を削除しますか?")
             .setPositiveButton("削除", { dialog, which ->
-                DeleteRecord()
+                var n=0;
+                DeleteRecord(n)
             })
             .setNegativeButton("cancel", { dialog, which ->
             })
@@ -94,7 +95,7 @@ class DispEdit : AppCompatActivity() {
         finish()
     }
 
-    fun DeleteRecord(){
+    fun DeleteRecord(n:Int){
         val POSTDATA = HashMap<String, String>()
         POSTDATA.put("rid", GLOBAL.RECORD[SelectNum].R_RID)
         POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
@@ -104,14 +105,15 @@ class DispEdit : AppCompatActivity() {
                     if(String(response.data).indexOf("SQL ERROR")!=-1){
                         mHandler.post(Runnable
                         {
-                            print("--------------------"+String(response.data))
-                            Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
+                            if(n<3) DeleteRecord(n+1)
+                            else Toast.makeText(applicationContext, "SQLエラー", Toast.LENGTH_SHORT).show()
                         })
                     }
                     else if(String(response.data).indexOf("HASH ERROR")!=-1){
                         mHandler.post(Runnable
                         {
-                            Toast.makeText(applicationContext, "HASHエラー", Toast.LENGTH_SHORT).show()
+                            if(n<3) DeleteRecord(n+1)
+                            else Toast.makeText(applicationContext, "HASHエラー", Toast.LENGTH_SHORT).show()
                         })
                     }
                     else{
@@ -126,7 +128,8 @@ class DispEdit : AppCompatActivity() {
                 is Result.Failure -> {
                     mHandler.post(Runnable
                     {
-                        Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                        if(n<3) DeleteRecord(n+1)
+                        else Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
                     })
                 }
             }
@@ -157,10 +160,18 @@ class DispEdit : AppCompatActivity() {
         val timePickerDialog = TimePickerDialog(
             this,
             TimePickerDialog.OnTimeSetListener() { view, hour, minutes->
-                str="${hour}時${minutes}分"
-                r1.setText(str)
-                str="${hour+3}時${minutes}分"
-                r2.setText(str)
+                if(hour>=21){
+                    str="${hour}時${minutes}分"
+                    r1.setText(str)
+                    str="23時59分"
+                    r2.setText(str)
+                }
+                else{
+                    str="${hour}時${minutes}分"
+                    r1.setText(str)
+                    str="${hour+3}時${minutes}分"
+                    r2.setText(str)
+                }
             },
             C_Hour,
             C_Minuts,
