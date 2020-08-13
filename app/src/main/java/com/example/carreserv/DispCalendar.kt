@@ -4,15 +4,12 @@ import android.content.Intent
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
-import kotlinx.android.synthetic.main.activity_disp_calendar.*
-import kotlinx.android.synthetic.main.activity_disp_send.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -55,40 +52,39 @@ class DispCalendar : AppCompatActivity() {
         if(NowOpenRecordDay!=""){CreateRecordList(NowOpenRecordDay)}
     }
 
-    fun CreateRecordList(cal:String){
-        val layout=findViewById<View>(R.id.ScrollView)as ViewGroup
-        layout.removeAllViews()
 
+    fun CreateRecordList(cal:String){
+        val SV=findViewById<View>(R.id.ScrollView)as ViewGroup
+        SV.removeAllViews()
+        var count=0;
         for(i in GLOBAL.RECORD.indices){
             if(GLOBAL.RECORD[i].R_STARTDATE==cal){
-                val text=TextView(this)
-                val sizetext=TextView(this)
-                val space1= Space(this)
-                val space2= Space(this)
-                val framelayout1=FrameLayout(this)
-                val framelayout2=FrameLayout(this)
-                val linearlayout=LinearLayout(this)
-                val image=ImageView(this)
-                val image2=ImageView(this)
-                image.setImageResource(R.drawable.ic_people)
-                image2.setImageResource(R.drawable.ic_people)
-                sizetext.text=""
-                sizetext.textSize=32F
-                text.text=GLOBAL.RECORD[i].R_STARTTIME+"　～　"+GLOBAL.RECORD[i].R_ENDTIME
-                text.setTextColor(Color.parseColor("#d2d2d2"))
-                text.setGravity(Gravity.CENTER)
-                text.textSize=32F
-                text.setTag(i)
-
-                layout.addView(space1,LinearLayout.LayoutParams(50,50))
-
-                layout.addView(framelayout1,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
-                framelayout1.addView(text,LinearLayout.LayoutParams(MATCH_PARENT,MATCH_PARENT))
-                linearlayout.addView(image,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
-                linearlayout.addView(image2,LinearLayout.LayoutParams(MATCH_PARENT,WRAP_CONTENT))
-
-
-                text.setOnClickListener{
+                getLayoutInflater().inflate(R.layout.recordlist,SV)
+                val layout=SV.getChildAt(count)as ConstraintLayout
+                count++
+                val text=GLOBAL.RECORD[i].R_STARTTIME+"　～　"+GLOBAL.RECORD[i].R_ENDTIME
+                layout.setTag(i)
+                ((layout.getChildAt(0)as TextView).setText(text))
+                //もし過去のデータであれば色を薄いグレーに設定
+                if(isBefore(i,false)){
+                    ((layout.getChildAt(0)as TextView).setTextColor(Color.parseColor("#D2D2D2")))
+                    if(GLOBAL.RECORD[i].R_ID==GLOBAL.userID){
+                        ((layout.getChildAt(1)as ImageView).setImageResource(R.drawable.ic_me_before))
+                    }
+                    else{
+                        ((layout.getChildAt(1)as ImageView).setImageResource(R.drawable.ic_people_before))
+                    }
+                }
+                else{
+                    ((layout.getChildAt(0)as TextView).setTextColor(Color.parseColor("#808080")))
+                    if(GLOBAL.RECORD[i].R_ID==GLOBAL.userID){
+                        ((layout.getChildAt(1)as ImageView).setImageResource(R.drawable.ic_me_after))
+                    }
+                    else{
+                        ((layout.getChildAt(1)as ImageView).setImageResource(R.drawable.ic_people_after))
+                    }
+                }
+                layout.setOnClickListener{
                     SelectRecord(it.getTag().toString().toInt())
                 }
             }//if end
@@ -97,32 +93,59 @@ class DispCalendar : AppCompatActivity() {
     }
 
     fun SelectRecord(num:Int){
-        val now=Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
-        var S_str = GLOBAL.RECORD[num].R_STARTDATE + GLOBAL.RECORD[num].R_STARTTIME
-        var S_date = S_str.split("年", "月", "日", "時", "分")
-
-        val S_calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
-
-        S_calendar.set(Calendar.YEAR, S_date[0].toInt())
-        S_calendar.set(Calendar.MONTH, S_date[1].toInt() - 1)
-        S_calendar.set(Calendar.DAY_OF_MONTH, S_date[2].toInt())
-        S_calendar.set(Calendar.HOUR_OF_DAY, S_date[3].toInt())
-        S_calendar.set(Calendar.MINUTE, S_date[4].toInt())
-
         //現在時刻より過去であれば参照ダイアログを表示
-        if(S_calendar.before(now)){
-            CreateDialog_Past(num)
-        }
-        else if(S_calendar.equals(now)){
+        if(isBefore(num,true)){
             CreateDialog_Past(num)
         }
         //未来の予定であれば削除や編集ボタンを含めたダイアログを表示
-        else if(GLOBAL.RECORD[num].R_ID!=GLOBAL.userID){//もしidが別の人ならNG!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            CreateDialog_Past(num)
+        else{
+            //且つ、自分以外であれば参照ダイアログのみの表示
+            if(GLOBAL.RECORD[num].R_ID!=GLOBAL.userID){
+                CreateDialog_Past(num)
+            }
+            else{
+                CreateDialog_Future(num)
+            }
+        }
+    }
+
+    fun isBefore(i:Int,startflg:Boolean):Boolean{
+        val now=Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
+        if(startflg){
+            var S_str = GLOBAL.RECORD[i].R_STARTDATE + GLOBAL.RECORD[i].R_STARTTIME
+            var S_date = S_str.split("年", "月", "日", "時", "分")
+
+            val S_calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
+
+            S_calendar.set(Calendar.YEAR, S_date[0].toInt())
+            S_calendar.set(Calendar.MONTH, S_date[1].toInt() - 1)
+            S_calendar.set(Calendar.DAY_OF_MONTH, S_date[2].toInt())
+            S_calendar.set(Calendar.HOUR_OF_DAY, S_date[3].toInt())
+            S_calendar.set(Calendar.MINUTE, S_date[4].toInt())
+
+            if(S_calendar.before(now)){
+                return true
+            }
+            else return S_calendar.equals(now)
         }
         else{
-            CreateDialog_Future(num)
+            var E_str = GLOBAL.RECORD[i].R_ENDDATE + GLOBAL.RECORD[i].R_ENDTIME
+            var E_date = E_str.split("年", "月", "日", "時", "分")
+
+            val E_calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
+
+            E_calendar.set(Calendar.YEAR, E_date[0].toInt())
+            E_calendar.set(Calendar.MONTH, E_date[1].toInt() - 1)
+            E_calendar.set(Calendar.DAY_OF_MONTH, E_date[2].toInt())
+            E_calendar.set(Calendar.HOUR_OF_DAY, E_date[3].toInt())
+            E_calendar.set(Calendar.MINUTE, E_date[4].toInt())
+
+            if(E_calendar.before(now)){
+                return true
+            }
+            else return E_calendar.equals(now)
         }
+
     }
 
     fun CreateDialog_Past(num :Int){
@@ -135,9 +158,9 @@ class DispCalendar : AppCompatActivity() {
             .setMessage("\n名前 : "+GLOBAL.RECORD[num].R_NAME +"\n\n"+
                     "\n開始 : "+GLOBAL.RECORD[num].R_STARTDATE+"　"+GLOBAL.RECORD[num].R_STARTTIME+"\n"+
                     "返却 : "+GLOBAL.RECORD[num].R_ENDDATE+"　"+GLOBAL.RECORD[num].R_ENDTIME+"\n\n" +
-                    "返却場所:"+GLOBAL.RECORD[num].R_PARK+"　　　"+fuel+"\n\n\n" +
-                    "開始時コメント:"+GLOBAL.RECORD[num].R_START_COMMENT+"\n\n\n" +
-                    "返却時コメント:"+GLOBAL.RECORD[num].R_START_COMMENT)
+                    "返却場所　:　"+GLOBAL.RECORD[num].R_PARK+"　　　"+fuel+"\n\n\n" +
+                    "開始時コメント　:　"+GLOBAL.RECORD[num].R_START_COMMENT+"\n\n\n" +
+                    "返却時コメント　:　"+GLOBAL.RECORD[num].R_START_COMMENT)
             //.setPositiveButton("OK"){dialog,which->}
             .create()
             .show()

@@ -348,7 +348,7 @@ class MainActivity : AppCompatActivity() {
     fun getTime(i:Int):String{
         val date= Calendar.getInstance()
         date.time= Date()
-        date.add(Calendar.HOUR,i)
+        date.add(Calendar.MINUTE,i)
         val df= SimpleDateFormat("HH時mm分")
         return df.format(date.time)
     }

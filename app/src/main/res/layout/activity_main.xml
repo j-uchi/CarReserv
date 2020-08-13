@@ -36,9 +36,15 @@
 
         <TextView
             android:id="@+id/strNext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
+            android:layout_width="0dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:autoSizeTextType="uniform"
+            android:gravity="center"
+            app:autoSizeMinTextSize="12sp"
             app:layout_constraintBottom_toTopOf="@+id/img_back"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

@@ -61,10 +61,21 @@ class DispEdit : AppCompatActivity() {
                 finish()
             }
             R.id.menu_delete->{
-                DeleteRecord()
+                CreateDeleteDialog()
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun CreateDeleteDialog(){
+        AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+            .setTitle("この予定を削除しますか?")
+            .setPositiveButton("削除", { dialog, which ->
+                DeleteRecord()
+            })
+            .setNegativeButton("cancel", { dialog, which ->
+            })
+            .show()
     }
 
     fun UpdateRecord(){
