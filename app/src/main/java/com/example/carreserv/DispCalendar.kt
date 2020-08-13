@@ -57,15 +57,48 @@ class DispCalendar : AppCompatActivity() {
         val SV=findViewById<View>(R.id.ScrollView)as ViewGroup
         SV.removeAllViews()
         var count=0;
+        val calstr=cal.split("年","月","日")
+        val now=Calendar.getInstance()
+        now.set(calstr[0].toInt(),calstr[1].toInt(),calstr[2].toInt())
         for(i in GLOBAL.RECORD.indices){
-            if(GLOBAL.RECORD[i].R_STARTDATE==cal){
+            val s_cal=Calendar.getInstance()
+            val s_str=GLOBAL.RECORD[i].R_STARTDATE.split("年","月","日")
+            val e_cal=Calendar.getInstance()
+            val e_str=GLOBAL.RECORD[i].R_ENDDATE.split("年","月","日")
+            s_cal.set(s_str[0].toInt(),s_str[1].toInt(),s_str[2].toInt())
+            e_cal.set(e_str[0].toInt(),e_str[1].toInt(),e_str[2].toInt())
+
+            //選択した日付が開始日～終了日に含まれている場合実行
+            if(BetweenDate(s_cal,now,e_cal)){
+
                 getLayoutInflater().inflate(R.layout.recordlist,SV)
                 val layout=SV.getChildAt(count)as ConstraintLayout
                 count++
-                val text=GLOBAL.RECORD[i].R_STARTTIME+"　～　"+GLOBAL.RECORD[i].R_ENDTIME
                 layout.setTag(i)
+                var text=""
+                //開始日が今日の場合
+                if(s_cal.get(Calendar.DAY_OF_MONTH)==now.get(Calendar.DAY_OF_MONTH)){
+                    if(e_cal.get(Calendar.DAY_OF_MONTH)==now.get(Calendar.DAY_OF_MONTH)){
+                        //今日ー今日
+                        text=GLOBAL.RECORD[i].R_STARTTIME+"　～　"+GLOBAL.RECORD[i].R_ENDTIME
+                    }
+                    else {
+                        //今日ー後日
+                        text=GLOBAL.RECORD[i].R_STARTTIME+"　～　"+e_str[1]+"月"+e_str[2]+"日"
+                    }
+                }
+                //開始日が今日よりも前の場合
+                else if(s_cal.get(Calendar.DAY_OF_MONTH)<now.get(Calendar.DAY_OF_MONTH)){
+                    if(e_cal.get(Calendar.DAY_OF_MONTH)==now.get(Calendar.DAY_OF_MONTH)){
+                        //前日ー今日
+                        text=s_str[1]+"月"+s_str[2]+"日"+"　～　"+GLOBAL.RECORD[i].R_ENDTIME
+                    }
+                    else if(now.get(Calendar.DAY_OF_MONTH)<e_cal.get(Calendar.DAY_OF_MONTH)){
+                        //前日ー後日
+                        text=s_str[1]+"月"+s_str[2]+"日"+"　～　"+e_str[1]+"月"+e_str[2]+"日"
+                    }
+                }
                 ((layout.getChildAt(0)as TextView).setText(text))
-                //もし過去のデータであれば色を薄いグレーに設定
                 if(isBefore(i,false)){
                     ((layout.getChildAt(0)as TextView).setTextColor(Color.parseColor("#D2D2D2")))
                     if(GLOBAL.RECORD[i].R_ID==GLOBAL.userID){
@@ -87,10 +120,23 @@ class DispCalendar : AppCompatActivity() {
                 layout.setOnClickListener{
                     SelectRecord(it.getTag().toString().toInt())
                 }
-            }//if end
-        }//for end
+            }
+
+        }
+
+
+
         NowOpenRecordDay=cal
     }
+
+    fun BetweenDate(s_cal:Calendar,now:Calendar,e_cal:Calendar):Boolean{
+        val s_calint=s_cal.get(Calendar.DAY_OF_MONTH)
+        val nowint=now.get(Calendar.DAY_OF_MONTH)
+        val e_calint=e_cal.get(Calendar.DAY_OF_MONTH)
+        if(s_calint<=nowint&&nowint<=e_calint)return true
+        else return false
+    }
+
 
     fun SelectRecord(num:Int){
         //現在時刻より過去であれば参照ダイアログを表示
