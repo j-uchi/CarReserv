@@ -55,7 +55,7 @@ class DispReserv : AppCompatActivity() {
 
 
     fun showDatePicker(r: Button){
-        var str=""
+        var str: String
         var btn=r.getText().toString()
         var time=btn.split("年","月","日")
 
@@ -69,7 +69,7 @@ class DispReserv : AppCompatActivity() {
 
         val datePickerDialog = DatePickerDialog(
             this,
-            DatePickerDialog.OnDateSetListener() {view, year, month, dayOfMonth->
+            DatePickerDialog.OnDateSetListener() { _, year, month, dayOfMonth->
                 str="${year}年${month+1}月${dayOfMonth}日"
                 r.setText(str)
             },
@@ -81,7 +81,7 @@ class DispReserv : AppCompatActivity() {
         datePickerDialog.show()
     }
     fun showDatePicker(r1: Button,r2:Button){
-        var str=""
+        var str: String
         var btn=r1.getText().toString()
         var time=btn.split("年","月","日")
 
@@ -91,7 +91,7 @@ class DispReserv : AppCompatActivity() {
 
         val datePickerDialog = DatePickerDialog(
             this,
-            DatePickerDialog.OnDateSetListener() {view, year, month, dayOfMonth->
+            DatePickerDialog.OnDateSetListener() { _, year, month, dayOfMonth->
                 str="${year}年${month+1}月${dayOfMonth}日"
                 r1.setText(str)
                 r2.setText(str)
@@ -105,7 +105,7 @@ class DispReserv : AppCompatActivity() {
     }
 
     fun showTimePicker(r: Button){
-        var str=""
+        var str: String
         var btn=r.getText().toString()
         var time=btn.split("時","分")
 
@@ -114,7 +114,7 @@ class DispReserv : AppCompatActivity() {
 
         val timePickerDialog = TimePickerDialog(
             this,
-            TimePickerDialog.OnTimeSetListener() {view, hour, minutes->
+            TimePickerDialog.OnTimeSetListener() { _, hour, minutes->
                 str="${hour}時${minutes}分"
                 r.setText(str)
             },
@@ -126,7 +126,7 @@ class DispReserv : AppCompatActivity() {
         timePickerDialog.show()
     }
     fun showTimePicker(r1: Button,r2: Button){
-        var str=""
+        var str: String
         var btn=r1.getText().toString()
         var time=btn.split("時","分")
 
@@ -135,7 +135,7 @@ class DispReserv : AppCompatActivity() {
 
         val timePickerDialog = TimePickerDialog(
             this,
-            TimePickerDialog.OnTimeSetListener() {view, hour, minutes->
+            TimePickerDialog.OnTimeSetListener() { _, hour, minutes->
                 if(hour>=21){
                     str="${hour}時${minutes}分"
                     r1.setText(str)
@@ -161,7 +161,7 @@ class DispReserv : AppCompatActivity() {
         val List=arrayOf("東比恵","大濠","薬院","学校","その他")
         AlertDialog.Builder(this)
             .setTitle("通知間隔を設定してください")
-            .setItems(List,{dialog,which->btnPark.setText(List[which])}).show()
+            .setItems(List) { _, which-> btnPark.text = List[which] }.show()
     }
 
     fun getDate():String{
@@ -173,7 +173,6 @@ class DispReserv : AppCompatActivity() {
     fun getTime(i:Int):String{
         val date= Calendar.getInstance()
         date.time= Date()
-        var a=date.get(Calendar.HOUR_OF_DAY)
         if(date.get(Calendar.HOUR_OF_DAY)+i>=24){
             date.add(Calendar.HOUR,23-date.get(Calendar.HOUR_OF_DAY))
             date.add(Calendar.MINUTE,59-date.get(Calendar.MINUTE))
@@ -186,7 +185,7 @@ class DispReserv : AppCompatActivity() {
     }
     //左上戻るボタンのリスナー設定
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item?.itemId){
+        when(item.itemId){
             android.R.id.home->{
                 finish()
             }

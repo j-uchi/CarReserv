@@ -3,11 +3,13 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/menu_Setting"
-        android:title="Setting" />
-    <item
         android:id="@+id/menu_calendar"
         android:icon="@drawable/ic_calendar"
         android:title="@string/calendar"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_Setting"
+        android:icon="@drawable/ic_account"
+        android:title="Setting"
+        app:showAsAction="always"/>
 </menu>

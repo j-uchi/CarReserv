@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/hiru0"
-            android:contentDescription="TODO" />
+            android:contentDescription="@string/todo" />
 
         <TextView
             android:id="@+id/strStatus"
@@ -55,7 +55,7 @@
             android:id="@+id/btnPark"
             android:layout_width="241dp"
             android:layout_height="85dp"
-            android:text="車を返す"
+            android:text="@string/btnParktxt"
             android:textSize="24sp"
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -74,7 +74,8 @@
             app:layout_constraintEnd_toEndOf="@+id/img_back"
             app:layout_constraintStart_toStartOf="@+id/img_back"
             app:layout_constraintTop_toTopOf="@+id/img_back"
-            tools:visibility="visible" />
+            tools:visibility="visible"
+            android:contentDescription="@string/todo" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"

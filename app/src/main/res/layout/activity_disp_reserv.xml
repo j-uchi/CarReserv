@@ -65,7 +65,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@android:drawable/ic_media_ff" />
+                    app:srcCompat="@android:drawable/ic_media_ff"
+                    android:contentDescription="@string/todo" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -109,7 +110,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
                     android:layout_marginLeft="32dp"
-                    android:text="返却場所 ："
+                    android:text="@string/textView5"
                     android:textSize="30sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -123,7 +124,7 @@
                     android:layout_marginEnd="32dp"
                     android:layout_marginRight="32dp"
                     android:layout_marginBottom="16dp"
-                    android:text="東比恵"
+                    android:text="@string/btnPark"
                     android:textSize="30sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -140,14 +141,15 @@
                     android:layout_height="73dp"
                     android:layout_marginTop="16dp"
                     android:ems="10"
-                    android:hint="コメントを入力"
+                    android:hint="@string/strComment"
                     android:inputType="textPersonName"
                     android:lines="3"
                     android:maxLength="120"
                     android:textSize="18sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:autofillHints="" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -160,7 +162,7 @@
                     android:layout_height="120dp"
                     android:layout_marginTop="32dp"
                     android:layout_marginBottom="24dp"
-                    android:text="予約"
+                    android:text="@string/btnReserv"
                     android:textSize="36sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"

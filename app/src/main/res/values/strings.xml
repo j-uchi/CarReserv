@@ -2,4 +2,16 @@
     <string name="app_name">CarReserv</string>
     <string name="calendar">calendar</string>
     <string name="delete">予約を削除</string>
+    <string name="parkText">返却場所</string>
+    <string name="strComment">コメントを入力</string>
+    <string name="btnEdit">変更</string>
+    <string name="textView5">返却場所 ：</string>
+    <string name="btnPark">東比恵</string>
+    <string name="btnReserv">予約</string>
+    <string name="textView">送信中...</string>
+    <string name="insertname">InsertName</string>
+    <string name="txtSending">送信中...</string>
+    <string name="btnParktxt">車を返す</string>
+    <string name="textview">TextView</string>
+    <string name="todo">TODO</string>
 </resources>

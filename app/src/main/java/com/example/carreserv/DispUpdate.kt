@@ -37,7 +37,7 @@ class DispUpdate : AppCompatActivity() {
         POSTDATA.put("refuel", GLOBAL.SEND_RECORD.R_REFUEL.toString())
         POSTDATA.put("hash", CreateHash(GLOBAL.SEND_RECORD.R_ID,GLOBAL.SEND_RECORD.R_STARTDATE,GLOBAL.SEND_RECORD.R_STARTTIME,GLOBAL.SEND_RECORD.R_ENDDATE,GLOBAL.SEND_RECORD.R_ENDTIME))
 
-        "https://myapp.tokyo/carreserv/change.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+        "https://myapp.tokyo/carreserv/change.php".httpPost(POSTDATA.toList()).response { _, response, result ->
             when (result) {
                 is Result.Success -> {
                     if(String(response.data).indexOf("Query OK")!=-1){
@@ -68,7 +68,7 @@ class DispUpdate : AppCompatActivity() {
     fun REFLESH(){
         val POSTDATA = java.util.HashMap<String, String>()
         POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm", Locale.getDefault()).format(Date())))
-        "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+        "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { _, response, result ->
             when (result) {
                 is Result.Success -> {
                     if(String(response.data).indexOf("SQL ERROR")!=-1){

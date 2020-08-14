@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.File
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,10 +34,10 @@ class MainActivity : AppCompatActivity() {
 
         //追加ボタンリスナークラス
         val fab:View=findViewById(R.id.fab)
-        fab.setOnClickListener{view->
+        fab.setOnClickListener{
             startActivity(Intent(this,DispReserv::class.java))
         }
-        btnPark.setOnClickListener{view->
+        btnPark.setOnClickListener{
             CreateParkDialog()
         }
         swipe_refresh.setOnRefreshListener{
@@ -60,11 +61,11 @@ class MainActivity : AppCompatActivity() {
     }
     //メニューボタンリスナークラス
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item?.itemId == R.id.menu_calendar){
+        if(item.itemId == R.id.menu_calendar){
             startActivity(Intent(this,DispCalendar::class.java))
         }
-        if(item?.itemId == R.id.menu_Setting){
-            startActivity(Intent(this,DispSetting::class.java))
+        if(item.itemId == R.id.menu_Setting){
+            CreateSettingDialog()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -74,23 +75,44 @@ class MainActivity : AppCompatActivity() {
         val strList = arrayOf("給油済み")
         val checkedItems = booleanArrayOf(false)
         val myedit = EditText(this)
-        var dialogComment: String = ""
+        var dialogComment: String
         var dialogRefuel: Boolean = false
 
         AlertDialog.Builder(this) // FragmentではActivityを取得して生成
             .setTitle("車を返却します")
-            .setMultiChoiceItems(strList, checkedItems, { dialog, which, isChecked ->
+            .setMultiChoiceItems(strList, checkedItems) { _, _, isChecked ->
                 dialogRefuel = isChecked
-            })
+            }
             .setView(myedit)
-            .setPositiveButton("OK", { dialog, which ->
+            .setPositiveButton("OK") { _, _ ->
                 dialogComment = myedit.getText().toString()
                 sendParkRequest(dialogComment,dialogRefuel)
-            })
-            .setNegativeButton("cancel", { dialog, which ->
+            }
+            .setNegativeButton("cancel") { _, _ ->
 
-            })
+            }
             .show()
+    }
+
+    fun CreateSettingDialog(){
+        val myedit = EditText(this)
+        myedit.setText(GLOBAL.NAME)
+        AlertDialog.Builder(this)
+            .setTitle("ユーザー名設定")
+            .setView(myedit)
+            .setPositiveButton("OK") { _, _ ->
+                SetName(myedit.text.toString())
+            }
+            .setNegativeButton("cancel") { _, _ ->
+            }
+            .show()
+    }
+
+    fun SetName(str:String){
+        GLOBAL.NAME=str
+        val cacheFile_name= "$filesDir/setting.csv"
+        val cacheFile= File(cacheFile_name)
+        cacheFile.writeText(str)
     }
 
     fun sendParkRequest(str:String,ref:Boolean){
@@ -119,7 +141,7 @@ class MainActivity : AppCompatActivity() {
         POSTDATA.put("refuel", GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_REFUEL.toString())
         POSTDATA.put("hash", CreateHash(GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_ID+buf_s_date+buf_s_time+buf_e_date+buf_e_time))
 
-        "https://myapp.tokyo/carreserv/change.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+        "https://myapp.tokyo/carreserv/change.php".httpPost(POSTDATA.toList()).response { _, response, result ->
             when (result) {
                 is Result.Success -> {
                     print(String(response.data))
@@ -159,7 +181,7 @@ class MainActivity : AppCompatActivity() {
     fun REFLESH(toastFlag:Boolean){
         val POSTDATA = HashMap<String, String>()
         POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
-        "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+        "https://myapp.tokyo/carreserv/get.php".httpPost(POSTDATA.toList()).response { _, response, result ->
             when (result) {
                 is Result.Success -> {
                     if(String(response.data).indexOf("SQL ERROR")!=-1){

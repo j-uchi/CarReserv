@@ -56,7 +56,7 @@ class DispEdit : AppCompatActivity() {
     }
     //メニューボタンリスナークラス
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item?.itemId){
+        when(item.itemId){
             android.R.id.home->{
                 finish()
             }
@@ -70,12 +70,12 @@ class DispEdit : AppCompatActivity() {
     fun CreateDeleteDialog(){
         AlertDialog.Builder(this) // FragmentではActivityを取得して生成
             .setTitle("この予定を削除しますか?")
-            .setPositiveButton("削除", { dialog, which ->
+            .setPositiveButton("削除") { _, _ ->
                 var n=0;
                 DeleteRecord(n)
-            })
-            .setNegativeButton("cancel", { dialog, which ->
-            })
+            }
+            .setNegativeButton("cancel") { _, _ ->
+            }
             .show()
     }
 
@@ -99,7 +99,7 @@ class DispEdit : AppCompatActivity() {
         val POSTDATA = HashMap<String, String>()
         POSTDATA.put("rid", GLOBAL.RECORD[SelectNum].R_RID)
         POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
-        "https://myapp.tokyo/carreserv/delete.php".httpPost(POSTDATA.toList()).response { request, response, result ->
+        "https://myapp.tokyo/carreserv/delete.php".httpPost(POSTDATA.toList()).response { _, response, result ->
             when (result) {
                 is Result.Success -> {
                     if(String(response.data).indexOf("SQL ERROR")!=-1){
@@ -147,10 +147,10 @@ class DispEdit : AppCompatActivity() {
         val List=arrayOf("東比恵","大濠","薬院","学校","その他")
         AlertDialog.Builder(this)
             .setTitle("通知間隔を設定してください")
-            .setItems(List,{dialog,which->btnPark.setText(List[which])}).show()
+            .setItems(List) { _, which-> btnPark.text = List[which] }.show()
     }
     fun showTimePicker(r1: Button, r2: Button){
-        var str=""
+        var str: String
         var btn=r1.getText().toString()
         var time=btn.split("時","分")
 
@@ -159,7 +159,7 @@ class DispEdit : AppCompatActivity() {
 
         val timePickerDialog = TimePickerDialog(
             this,
-            TimePickerDialog.OnTimeSetListener() { view, hour, minutes->
+            TimePickerDialog.OnTimeSetListener() { _, hour, minutes->
                 if(hour>=21){
                     str="${hour}時${minutes}分"
                     r1.setText(str)
@@ -181,7 +181,7 @@ class DispEdit : AppCompatActivity() {
         timePickerDialog.show()
     }
     fun showTimePicker(r: Button){
-        var str=""
+        var str: String
         var btn=r.getText().toString()
         var time=btn.split("時","分")
 
@@ -190,7 +190,7 @@ class DispEdit : AppCompatActivity() {
 
         val timePickerDialog = TimePickerDialog(
             this,
-            TimePickerDialog.OnTimeSetListener() {view, hour, minutes->
+            TimePickerDialog.OnTimeSetListener() { _, hour, minutes->
                 str="${hour}時${minutes}分"
                 r.setText(str)
             },
@@ -202,7 +202,7 @@ class DispEdit : AppCompatActivity() {
         timePickerDialog.show()
     }
     fun showDatePicker(r: Button){
-        var str=""
+        var str: String
         var btn=r.getText().toString()
         var time=btn.split("年","月","日")
 
@@ -216,7 +216,7 @@ class DispEdit : AppCompatActivity() {
 
         val datePickerDialog = DatePickerDialog(
             this,
-            DatePickerDialog.OnDateSetListener() { view, year, month, dayOfMonth->
+            DatePickerDialog.OnDateSetListener() { _, year, month, dayOfMonth->
                 str="${year}年${month+1}月${dayOfMonth}日"
                 r.setText(str)
             },
@@ -228,7 +228,7 @@ class DispEdit : AppCompatActivity() {
         datePickerDialog.show()
     }
     fun showDatePicker(r1: Button,r2:Button){
-        var str=""
+        var str: String
         var btn=r1.getText().toString()
         var time=btn.split("年","月","日")
 
@@ -238,7 +238,7 @@ class DispEdit : AppCompatActivity() {
 
         val datePickerDialog = DatePickerDialog(
             this,
-            DatePickerDialog.OnDateSetListener() { view, year, month, dayOfMonth->
+            DatePickerDialog.OnDateSetListener() { _, year, month, dayOfMonth->
                 str="${year}年${month+1}月${dayOfMonth}日"
                 r1.setText(str)
                 r2.setText(str)
