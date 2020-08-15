@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1020071373959",
+    "firebase_url": "https://carreserv-rasp.firebaseio.com",
+    "project_id": "carreserv-rasp",
+    "storage_bucket": "carreserv-rasp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1020071373959:android:60000692c19023f6bb5c22",
+        "android_client_info": {
+          "package_name": "com.example.carreserv"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1020071373959-6tnuefssl6lma8flr4spe00q5uh3495t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.carreserv",
+            "certificate_hash": "e3eee4b94fa21cfe940b800e286582d6945d4b49"
+          }
+        },
+        {
+          "client_id": "1020071373959-0s2r987d9h2l0cqgoodpk5k26o9phqct.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXkBkxKoGjKYODWQmV-nE1xwZ2sqke3EU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1020071373959-0s2r987d9h2l0cqgoodpk5k26o9phqct.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

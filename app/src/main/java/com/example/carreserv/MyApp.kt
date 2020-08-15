@@ -1,7 +1,12 @@
 package com.example.carreserv
 
 import android.app.Application
+import android.content.ContentValues.TAG
 import android.os.Build
+import android.util.Log
+import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.iid.FirebaseInstanceId
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.Serializable
@@ -29,6 +34,7 @@ class MyApp: Application(){
         super.onCreate()
         GLOBAL.userID=getID()
         READFILE()
+        GETTOKEN()
     }
 
     companion object{
@@ -38,6 +44,23 @@ class MyApp: Application(){
                 instance=MyApp()
             return instance!!
         }
+    }
+
+    fun GETTOKEN(){
+        FirebaseInstanceId.getInstance().instanceId
+            .addOnCompleteListener(OnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.w(TAG, "getInstanceId failed", task.exception)
+                    return@OnCompleteListener
+                }
+                // Get new Instance ID token
+                val token = task.result?.token
+                // Log and toast
+                val msg = token.toString()
+                Log.d(TAG, msg)
+                Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+            })
+
     }
 
     fun READFILE(){
