@@ -11,11 +11,11 @@ class MyApp: Application(){
 
 
     data class DC_RECORD(var R_RID:String,var R_ID:String,var R_NAME:String,var R_STARTDATE:String,var R_STARTTIME:String,var R_ENDDATE:String,
-                      var R_ENDTIME:String,var R_PARK:String,var R_START_COMMENT:String,var R_END_COMMENT:String,var R_REFUEL:Boolean)
+                      var R_ENDTIME:String,var R_PARK:String,var R_START_COMMENT:String,var R_END_COMMENT:String,var R_REFUEL:Boolean?)
 
     var RECORD=mutableListOf<DC_RECORD>()
 
-    var SEND_RECORD:DC_RECORD=DC_RECORD("","","","","","","","","","",false)
+    var SEND_RECORD:DC_RECORD=DC_RECORD("","","","","","","","","","",null)
 
     var userID:String=""
     var NAME:String=""

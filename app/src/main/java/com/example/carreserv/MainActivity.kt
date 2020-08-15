@@ -1,6 +1,7 @@
 package com.example.carreserv
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -230,7 +231,11 @@ class MainActivity : AppCompatActivity() {
             val PARK = scan.next()
             val S_COMMENT = scan.next()
             val E_COMMENT = scan.next()
-            val REFUEL = scan.next().toBoolean()
+            val buf=scan.next()
+            val REFUEL:Boolean?
+            if(buf=="true")REFUEL=true
+            else if(buf=="false")REFUEL=false
+            else REFUEL=null
             GLOBAL.RECORD.add(
                 MyApp.DC_RECORD(
                     RID,
@@ -251,6 +256,7 @@ class MainActivity : AppCompatActivity() {
 
     fun setStatus(){
         //未来に登録されたデータがあれば次回利用時間を表示
+        strNext.setTextColor(Color.parseColor("#808080"))
         if(GLOBAL.RECORD.size>0){
             for(i in GLOBAL.RECORD.indices){
                 var S_str = GLOBAL.RECORD[i].R_STARTDATE + GLOBAL.RECORD[i].R_STARTTIME
@@ -277,14 +283,34 @@ class MainActivity : AppCompatActivity() {
                 //開始時刻が今より未来であれば次回利用を表示
                 val now = Calendar.getInstance()
 
+
                 if (E_calendar.before(now)) {
-                    mHandler.post(Runnable
-                    {
-                        strNext.setText("利用予約はありません")
-                        strStatus.setText("未使用")
-                        findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
-                        btnPark.setVisibility(View.INVISIBLE)
-                    })
+                    //過去の予定で返却済みの場合
+                    if(GLOBAL.RECORD[i].R_REFUEL!=null){
+                        mHandler.post(Runnable
+                        {
+                            strNext.setText("利用予約はありません")
+                            strStatus.setText("未使用")
+                            findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.parking)
+                            btnPark.setVisibility(View.INVISIBLE)
+                        })
+                    }
+                    //過去の予定だが未返却の場合
+                    else{
+                        mHandler.post(Runnable
+                        {
+                            GLOBAL.nowRecordNumber=i
+                            strNext.setTextColor(Color.parseColor("#CC0000"))
+                            strNext.setText("返却予定：" + GLOBAL.RECORD[i].R_ENDDATE + " " + GLOBAL.RECORD[i].R_ENDTIME)
+                            strStatus.setText(GLOBAL.RECORD[i].R_NAME+"が使用中")
+                            findViewById<ImageView>(R.id.img_car).setImageResource(R.drawable.use)
+                            btnPark.setVisibility(View.INVISIBLE)
+                            if(GLOBAL.RECORD[i].R_ID==GLOBAL.userID){
+                                btnPark.setVisibility(View.VISIBLE)
+                            }
+                        })
+                        break
+                    }
                 } else if (S_calendar.before(now)||S_calendar.equals(now)) {
                     mHandler.post(Runnable
                     {

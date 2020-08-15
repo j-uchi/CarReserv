@@ -46,7 +46,7 @@ class DispReserv : AppCompatActivity() {
         val R_END_TIME=btn_EndTime.getText().toString().replace("時",":").replace("分","")
         val R_PARK=btnPark.getText().toString()
         val R_COMMENT=""+strComment.getText().toString()//NULL対策
-        GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",false)
+        GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",null)
         startActivity(Intent(this,DispSend::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish()

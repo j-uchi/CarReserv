@@ -41,7 +41,7 @@ class DispEdit : AppCompatActivity() {
         setContentView(R.layout.activity_disp_edit)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         btn_StartDate.setOnClickListener{showDatePicker(btn_StartDate,btn_EndDate)}
-        btn_StartTime.setOnClickListener{showTimePicker(btn_StartTime,btn_EndTime)}
+        btn_StartTime.setOnClickListener{showTimePicker(btn_StartTime)}
         btn_EndDate.setOnClickListener{showDatePicker(btn_EndDate)}
         btn_EndTime.setOnClickListener{showTimePicker(btn_EndTime)}
         btnPark.setOnClickListener{ CreateDialog() }
@@ -89,7 +89,7 @@ class DispEdit : AppCompatActivity() {
         val R_END_TIME=btn_EndTime.getText().toString().replace("時",":").replace("分","")
         val R_PARK=btnPark.getText().toString()
         val R_COMMENT=""+strComment.getText().toString()//NULL対策
-        GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",false)
+        GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",null)
         startActivity(Intent(this,DispUpdate::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
         finish()
@@ -148,37 +148,6 @@ class DispEdit : AppCompatActivity() {
         AlertDialog.Builder(this)
             .setTitle("通知間隔を設定してください")
             .setItems(List) { _, which-> btnPark.text = List[which] }.show()
-    }
-    fun showTimePicker(r1: Button, r2: Button){
-        var str: String
-        var btn=r1.getText().toString()
-        var time=btn.split("時","分")
-
-        val C_Hour=time[0].toInt()
-        val C_Minuts=time[1].toInt()
-
-        val timePickerDialog = TimePickerDialog(
-            this,
-            TimePickerDialog.OnTimeSetListener() { _, hour, minutes->
-                if(hour>=21){
-                    str="${hour}時${minutes}分"
-                    r1.setText(str)
-                    str="23時59分"
-                    r2.setText(str)
-                }
-                else{
-                    str="${hour}時${minutes}分"
-                    r1.setText(str)
-                    str="${hour+3}時${minutes}分"
-                    r2.setText(str)
-                }
-            },
-            C_Hour,
-            C_Minuts,
-            true)
-        timePickerDialog.setCanceledOnTouchOutside(false)
-        timePickerDialog.setCancelable(false)
-        timePickerDialog.show()
     }
     fun showTimePicker(r: Button){
         var str: String

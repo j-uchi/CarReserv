@@ -133,8 +133,7 @@ class DispCalendar : AppCompatActivity() {
         val s_calint=s_cal.get(Calendar.DAY_OF_MONTH)
         val nowint=now.get(Calendar.DAY_OF_MONTH)
         val e_calint=e_cal.get(Calendar.DAY_OF_MONTH)
-        if(s_calint<=nowint&&nowint<=e_calint)return true
-        else return false
+        return nowint in s_calint..e_calint
     }
 
 
@@ -196,7 +195,7 @@ class DispCalendar : AppCompatActivity() {
 
     fun CreateDialog_Past(num :Int){
         var fuel:String="（ 未給油 ）"
-        if(GLOBAL.RECORD[num].R_REFUEL){
+        if(GLOBAL.RECORD[num].R_REFUEL==true){
             fuel="（ 給油済 ）"
         }
         AlertDialog.Builder(this)
@@ -206,7 +205,7 @@ class DispCalendar : AppCompatActivity() {
                     "返却 : "+GLOBAL.RECORD[num].R_ENDDATE+"　"+GLOBAL.RECORD[num].R_ENDTIME+"\n\n" +
                     "返却場所　:　"+GLOBAL.RECORD[num].R_PARK+"　　　"+fuel+"\n\n\n" +
                     "開始時コメント　:　"+GLOBAL.RECORD[num].R_START_COMMENT+"\n\n\n" +
-                    "返却時コメント　:　"+GLOBAL.RECORD[num].R_START_COMMENT)
+                    "返却時コメント　:　"+GLOBAL.RECORD[num].R_END_COMMENT)
             //.setPositiveButton("OK"){dialog,which->}
             .create()
             .show()
