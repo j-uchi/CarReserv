@@ -34,7 +34,7 @@ class MyApp: Application(){
         super.onCreate()
         GLOBAL.userID=getID()
         READFILE()
-        GETTOKEN()
+        //GETTOKEN()
     }
 
     companion object{

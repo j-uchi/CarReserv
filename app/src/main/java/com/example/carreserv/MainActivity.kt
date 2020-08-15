@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.File
 import java.security.MessageDigest
@@ -30,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        FirebaseMessaging.getInstance().subscribeToTopic("USER");
         RandomBackGround()
         REFLESH(true)
 
