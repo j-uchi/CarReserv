@@ -163,8 +163,8 @@ class MainActivity : AppCompatActivity() {
                     else{
                         mHandler.post(Runnable
                         {
-                            Toast.makeText(applicationContext, "返却しました", Toast.LENGTH_SHORT).show()
-                            REFLESH(false)
+                            SEND_Notification(0,"返却情報",GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_NAME+"さんが"+GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_PARK+"に車を返却しました")
+
                         })
                     }
                 }
@@ -348,6 +348,36 @@ class MainActivity : AppCompatActivity() {
                 btnPark.setVisibility(View.INVISIBLE)
             })
 
+        }
+    }
+
+    fun SEND_Notification(n:Int,title:String,body:String){
+        val POSTDATA = HashMap<String, String>()
+
+        POSTDATA.put("title", title)
+        POSTDATA.put("body", body)
+        POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
+
+        "https://myapp.tokyo/carreserv/notification.php".httpPost(POSTDATA.toList()).response { _, response, result ->
+            when (result) {
+                is Result.Success -> {
+                    mHandler.post(Runnable
+                    {
+                        Toast.makeText(applicationContext, "返却しました", Toast.LENGTH_SHORT).show()
+                        REFLESH(false)
+                    })
+                }
+                is Result.Failure -> {
+                    mHandler.post(Runnable
+                    {
+                        if(n<3) SEND_Notification(n+1,title,body)
+                        else {
+                            Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
+                    })
+                }
+            }
         }
     }
 

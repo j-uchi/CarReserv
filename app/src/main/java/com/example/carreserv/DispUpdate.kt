@@ -43,8 +43,7 @@ class DispUpdate : AppCompatActivity() {
                     if(String(response.data).indexOf("Query OK")!=-1){
                         mHandler.post(Runnable
                         {
-                            REFLESH()
-                            Toast.makeText(applicationContext, "変更しました", Toast.LENGTH_SHORT).show()
+                            SEND_Notification(0,"予約変更",GLOBAL.SEND_RECORD.R_NAME+"さんが "+GLOBAL.SEND_RECORD.R_STARTDATE+"　"+GLOBAL.SEND_RECORD.R_STARTTIME+" 開始の予約を変更しました")
                             finish()
                         })
                     }
@@ -59,6 +58,37 @@ class DispUpdate : AppCompatActivity() {
                     mHandler.post(Runnable
                     {
                         Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                    })
+                }
+            }
+        }
+    }
+
+    fun SEND_Notification(n:Int,title:String,body:String){
+        val POSTDATA = HashMap<String, String>()
+
+        POSTDATA.put("title", title)
+        POSTDATA.put("body", body)
+        POSTDATA.put("hash", CreateHash(SimpleDateFormat("yyyyMMddHHmm",Locale.getDefault()).format(Date())))
+
+        "https://myapp.tokyo/carreserv/notification.php".httpPost(POSTDATA.toList()).response { _, response, result ->
+            when (result) {
+                is Result.Success -> {
+                    mHandler.post(Runnable
+                    {
+                        REFLESH()
+                        Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_SHORT).show()
+                        finish()
+                    })
+                }
+                is Result.Failure -> {
+                    mHandler.post(Runnable
+                    {
+                        if(n<3) SEND_Notification(n+1,title,body)
+                        else {
+                            Toast.makeText(applicationContext, "接続エラー", Toast.LENGTH_SHORT).show()
+                            finish()
+                        }
                     })
                 }
             }
