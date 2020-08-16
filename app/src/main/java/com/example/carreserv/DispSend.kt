@@ -1,18 +1,17 @@
 package com.example.carreserv
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
-import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
-import kotlinx.android.synthetic.main.activity_disp_send.*
-import kotlinx.android.synthetic.main.activity_main.*
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.HashMap
+
 
 class DispSend : AppCompatActivity() {
 
@@ -49,6 +48,13 @@ class DispSend : AppCompatActivity() {
                         mHandler.post(Runnable
                         {
                             SEND_Notification(0,"新規予約情報",GLOBAL.SEND_RECORD.R_NAME+"さんが "+GLOBAL.SEND_RECORD.R_STARTDATE+"　"+GLOBAL.SEND_RECORD.R_STARTTIME+" 開始の予約をしました")
+                        })
+                    }
+                    else if(String(response.data).indexOf("TIME DUPLICATION")!=-1){
+                        mHandler.post(Runnable
+                        {
+                            Toast.makeText(applicationContext, "同じ時刻に予約が入っています", Toast.LENGTH_SHORT).show()
+                            finish()
                         })
                     }
                     else{
@@ -88,9 +94,10 @@ class DispSend : AppCompatActivity() {
                 is Result.Success -> {
                     mHandler.post(Runnable
                     {
-                        print("-------------------------------"+String(response.data))
                         Toast.makeText(applicationContext, "登録しました", Toast.LENGTH_SHORT).show()
-                        finish()
+                        val intent = Intent(application, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        startActivity(intent)
                     })
                 }
                 is Result.Failure -> {

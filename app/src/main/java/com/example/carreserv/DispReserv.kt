@@ -48,8 +48,7 @@ class DispReserv : AppCompatActivity() {
         val R_COMMENT=""+strComment.getText().toString()//NULL対策
         GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",null)
         startActivity(Intent(this,DispSend::class.java))
-        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        finish()
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
     }
 
 
@@ -160,7 +159,7 @@ class DispReserv : AppCompatActivity() {
     fun CreateDialog(){
         val List=arrayOf("東比恵","大濠","薬院","学校","その他")
         AlertDialog.Builder(this)
-            .setTitle("通知間隔を設定してください")
+            .setTitle("返却場所を選択してください")
             .setItems(List) { _, which-> btnPark.text = List[which] }.show()
     }
 

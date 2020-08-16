@@ -55,7 +55,6 @@ class MainActivity : AppCompatActivity() {
     override fun onRestart() {
         super.onRestart()
         RandomBackGround()
-        REFLESH(false)
     }
     //メニューボタン生成
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -90,6 +89,7 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton("OK") { _, _ ->
                 dialogComment = myedit.getText().toString()
                 sendParkRequest(dialogComment,dialogRefuel)
+                REFLESH(true)
             }
             .setNegativeButton("cancel") { _, _ ->
 
