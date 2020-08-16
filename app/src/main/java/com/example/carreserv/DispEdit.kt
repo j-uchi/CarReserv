@@ -92,7 +92,6 @@ class DispEdit : AppCompatActivity() {
         GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",null)
         startActivity(Intent(this,DispUpdate::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-        finish()
     }
 
     fun DeleteRecord(n:Int){

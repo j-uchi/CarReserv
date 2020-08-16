@@ -16,7 +16,6 @@ import java.util.*
 class DispCalendar : AppCompatActivity() {
 
     val GLOBAL=MyApp.getInstance()
-    var NowOpenRecordDay:String=""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +48,6 @@ class DispCalendar : AppCompatActivity() {
     //再アクティブ時動作
     override fun onRestart() {
         super.onRestart()
-        if(NowOpenRecordDay!=""){CreateRecordList(NowOpenRecordDay)}
     }
 
 
@@ -124,9 +122,6 @@ class DispCalendar : AppCompatActivity() {
 
         }
 
-
-
-        NowOpenRecordDay=cal
     }
 
     fun BetweenDate(s_cal:Calendar,now:Calendar,e_cal:Calendar):Boolean{
@@ -194,9 +189,15 @@ class DispCalendar : AppCompatActivity() {
     }
 
     fun CreateDialog_Past(num :Int){
-        var fuel:String="（ 未給油 ）"
+        var fuel:String
         if(GLOBAL.RECORD[num].R_REFUEL==true){
             fuel="（ 給油済 ）"
+        }
+        else if(GLOBAL.RECORD[num].R_REFUEL==false){
+            fuel="（ 未給油 ）"
+        }
+        else{
+            fuel=""
         }
         AlertDialog.Builder(this)
             .setTitle("利用履歴")

@@ -1,5 +1,6 @@
 package com.example.carreserv
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -44,7 +45,9 @@ class DispUpdate : AppCompatActivity() {
                         mHandler.post(Runnable
                         {
                             SEND_Notification(0,"予約変更",GLOBAL.SEND_RECORD.R_NAME+"さんが "+GLOBAL.SEND_RECORD.R_STARTDATE+"　"+GLOBAL.SEND_RECORD.R_STARTTIME+" 開始の予約を変更しました")
-                            finish()
+                            val intent = Intent(application, DispCalendar::class.java)
+                            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            startActivity(intent)
                         })
                     }
                     else{
