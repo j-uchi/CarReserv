@@ -33,7 +33,7 @@ class DispCalendar : AppCompatActivity() {
 
         // 日付変更イベントを追加
         calendarView.setOnDateChangeListener { view, year, month, dayOfMonth ->
-            CreateRecordList(getDateString(year,month,dayOfMonth))
+            CreateRecordList(getDateString(year,month+1,dayOfMonth))
         }
     }
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -125,10 +125,20 @@ class DispCalendar : AppCompatActivity() {
     }
 
     fun BetweenDate(s_cal:Calendar,now:Calendar,e_cal:Calendar):Boolean{
+
+        var flg=false
         val s_calint=s_cal.get(Calendar.DAY_OF_MONTH)
         val nowint=now.get(Calendar.DAY_OF_MONTH)
         val e_calint=e_cal.get(Calendar.DAY_OF_MONTH)
-        return nowint in s_calint..e_calint
+        if(nowint in s_calint..e_calint){
+            val s_calmint=s_cal.get(Calendar.MONTH)
+            val nowmint=now.get(Calendar.MONTH)
+            val e_calmint=e_cal.get(Calendar.MONTH)
+            if(s_calmint==nowmint||e_calmint==nowmint){
+                flg=true
+            }
+        }
+        return flg
     }
 
 
@@ -219,11 +229,11 @@ class DispCalendar : AppCompatActivity() {
                     "開始 : "+GLOBAL.RECORD[num].R_STARTDATE+"　"+GLOBAL.RECORD[num].R_STARTTIME+"\n"+
                     "返却 : "+GLOBAL.RECORD[num].R_ENDDATE+"　"+GLOBAL.RECORD[num].R_ENDTIME+"\n\n" +
                     "開始時コメント:"+GLOBAL.RECORD[num].R_START_COMMENT)
-            .setPositiveButton("編集",{dialog,which->
+            .setPositiveButton("編集") { dialog, which->
                 intent= Intent(this,DispEdit::class.java)
                 intent.putExtra("num",num)
                 startActivity(intent)
-            })
+            }
             .setNegativeButton("キャンセル", { dialog, which ->})
             .create()
             .show()
@@ -232,7 +242,7 @@ class DispCalendar : AppCompatActivity() {
     fun getDateString(year:Int,month:Int,day:Int):String{
         var calendar=Calendar.getInstance(TimeZone.getTimeZone("Asia/Tokyo"), Locale.JAPAN)
         calendar.set(Calendar.YEAR,year)
-        calendar.set(Calendar.MONTH,month)
+        calendar.set(Calendar.MONTH,month-1)
         calendar.set(Calendar.DAY_OF_MONTH,day)
         var day=SimpleDateFormat("yyyy年MM月dd日").format(calendar.getTime())
         return day
