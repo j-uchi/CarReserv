@@ -157,7 +157,7 @@ class DispReserv : AppCompatActivity() {
     }
 
     fun CreateDialog(){
-        val List=arrayOf("東比恵","大濠","薬院","学校","その他")
+        val List=arrayOf("東比恵","大濠","薬院","学校","屋形原","その他")
         AlertDialog.Builder(this)
             .setTitle("返却場所を選択してください")
             .setItems(List) { _, which-> btnPark.text = List[which] }.show()
