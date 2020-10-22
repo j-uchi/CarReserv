@@ -15,7 +15,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.result.Result
 import com.google.firebase.messaging.FirebaseMessaging
+import kotlinx.android.synthetic.main.activity_disp_reserv.*
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.btnPark
 import java.io.File
 import java.security.MessageDigest
 import java.text.SimpleDateFormat
@@ -80,18 +82,43 @@ class MainActivity : AppCompatActivity() {
         var dialogRefuel: Boolean = false
 
         AlertDialog.Builder(this) // FragmentではActivityを取得して生成
-            .setTitle("車を返却します")
+            .setTitle(GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_PARK+"に車を返却します")
             .setMultiChoiceItems(strList, checkedItems) { _, _, isChecked ->
                 dialogRefuel = isChecked
             }
             .setView(myedit)
             .setPositiveButton("OK") { _, _ ->
-                dialogComment = myedit.getText().toString()
+                dialogComment = myedit.getText().toString().replace(",","，")
                 sendParkRequest(dialogComment,dialogRefuel)
                 REFLESH(true)
             }
             .setNegativeButton("cancel") { _, _ ->
 
+            }
+            .setNeutralButton("返却場所を変更"){_,_ ->
+                CreateParkChoiceDialog()
+            }
+
+            .show()
+    }
+
+    fun CreateParkChoiceDialog(){
+        val List=arrayOf("東比恵","大濠","薬院","学校","屋形原")
+        AlertDialog.Builder(this)
+            .setTitle("返却場所を選択してください")
+            .setItems(List) { _, which-> GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_PARK = List[which]
+                CreateParkDialog()
+            }
+            .setPositiveButton("その他") { dialog, which->
+                //その他時処理記載
+                val myedit=EditText(this)
+                AlertDialog.Builder(this)
+                    .setTitle("返却場所を入力してください")
+                    .setView(myedit)
+                    .setPositiveButton("OK") { dialog, which->
+                        GLOBAL.RECORD[GLOBAL.nowRecordNumber].R_PARK=myedit.getText().toString()
+                        CreateParkDialog()
+                    }.show()
             }
             .show()
     }

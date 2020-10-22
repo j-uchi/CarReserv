@@ -10,6 +10,7 @@ import android.os.Handler
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.github.kittinunf.fuel.httpPost
@@ -88,7 +89,7 @@ class DispEdit : AppCompatActivity() {
         val R_END_DATE=btn_EndDate.getText().toString().replace("年","/").replace("月","/").replace("日","")
         val R_END_TIME=btn_EndTime.getText().toString().replace("時",":").replace("分","")
         val R_PARK=btnPark.getText().toString()
-        val R_COMMENT=""+strComment.getText().toString()//NULL対策
+        val R_COMMENT=""+strComment.getText().toString().replace(",","，")//NULL対策
         GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",null)
         startActivity(Intent(this,DispUpdate::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -143,10 +144,21 @@ class DispEdit : AppCompatActivity() {
         strComment.setText(GLOBAL.RECORD[num].R_START_COMMENT)
     }
     fun CreateDialog(){
-        val List=arrayOf("東比恵","大濠","薬院","学校","その他")
+        val List=arrayOf("東比恵","大濠","薬院","学校","屋形原")
         AlertDialog.Builder(this)
-            .setTitle("通知間隔を設定してください")
-            .setItems(List) { _, which-> btnPark.text = List[which] }.show()
+            .setTitle("返却場所を選択してください")
+            .setItems(List) { _, which-> btnPark.text = List[which] }
+            .setPositiveButton("その他") { dialog, which->
+                //その他時処理記載\
+                val myedit= EditText(this)
+                AlertDialog.Builder(this)
+                    .setTitle("返却場所を入力してください")
+                    .setView(myedit)
+                    .setPositiveButton("OK") { dialog, which->
+                        btnPark.text=myedit.getText().toString()
+                    }.show()
+            }
+            .show()
     }
     fun showTimePicker(r: Button){
         var str: String

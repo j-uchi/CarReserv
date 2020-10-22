@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_disp_reserv.*
@@ -45,7 +46,7 @@ class DispReserv : AppCompatActivity() {
         val R_END_DATE=btn_EndDate.getText().toString().replace("年","/").replace("月","/").replace("日","")
         val R_END_TIME=btn_EndTime.getText().toString().replace("時",":").replace("分","")
         val R_PARK=btnPark.getText().toString()
-        val R_COMMENT=""+strComment.getText().toString()//NULL対策
+        val R_COMMENT=""+strComment.getText().toString().replace(",","，")//NULL対策及びCSV破損防止
         GLOBAL.SEND_RECORD= MyApp.DC_RECORD(R_RID,R_ID,R_NAME,R_START_DATE,R_START_TIME,R_END_DATE,R_END_TIME,R_PARK,R_COMMENT,"",null)
         startActivity(Intent(this,DispSend::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
@@ -157,10 +158,21 @@ class DispReserv : AppCompatActivity() {
     }
 
     fun CreateDialog(){
-        val List=arrayOf("東比恵","大濠","薬院","学校","屋形原","その他")
+        val List=arrayOf("東比恵","大濠","薬院","学校","屋形原")
         AlertDialog.Builder(this)
             .setTitle("返却場所を選択してください")
-            .setItems(List) { _, which-> btnPark.text = List[which] }.show()
+            .setItems(List) { _, which-> btnPark.text = List[which] }
+            .setPositiveButton("その他") { dialog, which->
+                //その他時処理記載\
+                val myedit=EditText(this)
+                AlertDialog.Builder(this)
+                    .setTitle("返却場所を入力してください")
+                    .setView(myedit)
+                    .setPositiveButton("OK") { dialog, which->
+                        btnPark.text=myedit.getText().toString()
+                    }.show()
+            }
+            .show()
     }
 
     fun getDate():String{
